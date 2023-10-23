@@ -6,7 +6,23 @@
 
 #define PLAYER_MAX		10
 
-bool player[PLAYER_MAX];  // 기본값 true, 탈락하면 false
+typedef struct {
+	char name[100];
+	int intel_buf, str_buf, stamina_buf;
+}ITEM;
+
+typedef struct {
+	int id;
+	char name[100];
+
+	int intel, strm, stamina;
+
+	bool is_alive;
+	bool hasitem;
+	ITEM item;
+}PLAYER;
+
+PLAYER player[PLAYER_MAX];  // 기본값 true, 탈락하면 false
 bool pass[PLAYER_MAX]; // 기본값 false, 통과하면 true
 int n_player, n_alive;
 int tick;  // 시계
