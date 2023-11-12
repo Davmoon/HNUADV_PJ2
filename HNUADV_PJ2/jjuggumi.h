@@ -27,6 +27,7 @@ typedef struct {
 
 ITEM item[ITEM_MAX];
 PLAYER player[PLAYER_MAX];  // 구조체 배열
+bool pass[PLAYER_MAX]; // 기본값 false, 통과하면 true
 int n_player, n_alive, n_item;
 int tick;  // 시계
 
