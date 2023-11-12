@@ -74,12 +74,11 @@ void print_status(void) {
 
 	//10일 경우 남는 칸 생김
 	if (n_alive != 10) { printf("no. of players left: 0%d\n", n_alive);}
-	else {
-	printf("no. of players left: %d\n", n_alive);
-	}
+	else { printf("no. of players left: %d\n", n_alive); }
+	printf("\t\t\tintl\tstr\tstm\n");
 
 	for (int p = 0; p < n_player; p++) {
-		printf("player %2d: %5s\n", p, player[p].is_alive ? "alive" : "DEAD");
+		printf("player %2d: %5s\t%d(+%d)\t%d(+%d)\t%d%%\n", p, player[p].is_alive ? "alive" : "DEAD", player[p].intel, player[p].item.intel_buf, player[p].str, player[p].item.str_buf, player[p].stamina, player[p].item.stamina_buf);
 	}
 }
 
