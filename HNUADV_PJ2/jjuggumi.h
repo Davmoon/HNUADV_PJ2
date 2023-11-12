@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define PLAYER_MAX		10
-#define ITEM_MAX		10
+#define ITEM_MAX	10
 
 typedef struct {
 	char name[100];
@@ -19,14 +19,13 @@ typedef struct {
 	// 능력치: 지능, 힘, 스태미나
 	int intel, str, stamina;
 
-	// 현재 상태
 	bool is_alive;
 	bool hasitem;
 	ITEM item;
 }PLAYER;
 
+PLAYER player[PLAYER_MAX];  // 기본값 true, 탈락하면 false
 ITEM item[ITEM_MAX];
-PLAYER player[PLAYER_MAX];  // 구조체 배열
 bool pass[PLAYER_MAX]; // 기본값 false, 통과하면 true
 int n_player, n_alive, n_item;
 int tick;  // 시계
