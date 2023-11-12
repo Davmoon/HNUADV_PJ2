@@ -25,6 +25,9 @@ int jjuggumi_init(void) {
     }
 
     fscanf_s(fp, "%d", &n_player);
+    
+    n_alive = n_player; //살아있는 플레이어 = 처음 플레이어 수
+
     for (int i = 0; i < n_player; i++) {
         // 아직 안 배운 문법(구조체 포인터, 간접참조연산자)
         PLAYER* p = &player[i];

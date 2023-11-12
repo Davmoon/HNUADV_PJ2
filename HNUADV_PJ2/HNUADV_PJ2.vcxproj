@@ -19,9 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="jjuggumi.dat" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="canvas.c" />
     <ClCompile Include="jebi.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -35,6 +32,9 @@
     <ClInclude Include="canvas.h" />
     <ClInclude Include="jjuggumi.h" />
     <ClInclude Include="keyin.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="jjuggumi.dat" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
