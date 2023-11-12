@@ -30,7 +30,7 @@ void m_init(void) {
 	int x, y;
 	// 끝 자리에 살아남은 플레이어가 랜덤하게 배치되는 코드
 	for (int i = 0; i < n_player; i++) {
-		if (player[i] == true) {
+		if (player[i].is_alive == true) {
 			do {
 				x = randint(1, 11);
 				y = 33;
@@ -98,7 +98,7 @@ void pass_zone(void) {
 	//yh 3개이므로 인식부분이 5개(변경가능)
 	for (int i = 0; i < n_player; i++) {
 		//pass 처리와 false 처리가 운좋게 동시에 처리되는 상황 방지
-		if (player[i] == true) {
+		if (player[i].is_alive == true) {
 
 			if ((px[i] == 4 && py[i] == 1) ||
 				(px[i] == 5 && py[i] == 2) ||
@@ -175,7 +175,7 @@ void yh_no_watch(int yh_period[]) {
 
 void mv_ten() {
 	for (int i = 1; i < n_player; i++) {
-		if (player[i] == true && pass[i] == false && randint(0, 9) == 1) {
+		if (player[i].is_alive == true && pass[i] == false && randint(0, 9) == 1) {
 			// catch_mv를 돌리고 제자리인지 확인, 아니면 이동한 자리에서 다시 가려졌는지 검사함. (머리 빡세게 굴렸다...)
 			if (!catch_mv(i, true, '\0')) {
 				catch_mv(i, false, '\0');
@@ -191,7 +191,7 @@ bool catch_mv(int pnum, bool count, key_t key) {
 	for (int i = 0; i < n_player; i++) {
 
 		// if문의 조건 < 에서 자기자신은 걸러짐 (등호 없음)
-		if (player[i] == true && pass[i] == false && py[i] < py[pnum] && px[i] == px[pnum]) {
+		if (player[i].is_alive == true && pass[i] == false && py[i] < py[pnum] && px[i] == px[pnum]) {
 
 			//테스트 좌표 출력
 			//gotoxy(N_ROW + 3, 0);
@@ -206,7 +206,7 @@ bool catch_mv(int pnum, bool count, key_t key) {
 		}
 		else { al_chk_count++; }
 
-		if (player[pnum] == true && pass[pnum] == false && al_chk_count == n_player) {
+		if (player[pnum].is_alive == true && pass[pnum] == false && al_chk_count == n_player) {
 			// 움직인 공간에 다른 플레이어가 존재해 움직이지 못하고 가만히 있는 상태일때
 			if (pnum == 0 && count == true && move_manual(key) == false) {
 				move_manual(key);
@@ -222,7 +222,7 @@ bool catch_mv(int pnum, bool count, key_t key) {
 			
 			
 			back_buf[px[pnum]][py[pnum]] = ' ';
-			player[pnum] = false;
+			player[pnum].is_alive = false;
 			sprintf(msg1, "%s %d", msg1, pnum); //kill 플레이어 저장
 			
 			n_alive--;
@@ -253,7 +253,7 @@ void mugunghwa(void) {
 		}
 		else if (key != K_UNDEFINED) {
 
-			if (pass[0] == false && player[0] == true) {
+			if (pass[0] == false && player[0].is_alive == true) {
 				if (len <= 9) {
 					move_manual(key);
 				}
@@ -267,7 +267,7 @@ void mugunghwa(void) {
 		}
 
 		for (int i = 1; i < n_player; i++) {
-			if (tick % period[i] == 0 && player[i] == true && pass[i] == false) {
+			if (tick % period[i] == 0 && player[i].is_alive == true && pass[i] == false) {
 				// 10인 경우, yh_no_watch 안의 ten_mv에서 작동(10% 중복 작동 방지 위해)
 				if (len <= 9) {
 					mv_m_random(i);

@@ -18,6 +18,24 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="jjuggumi.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="canvas.c" />
+    <ClCompile Include="jebi.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="jjuggumi.c" />
+    <ClCompile Include="keyin.c" />
+    <ClCompile Include="mugunghwa.c" />
+    <ClCompile Include="sample.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="canvas.h" />
+    <ClInclude Include="jjuggumi.h" />
+    <ClInclude Include="keyin.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -126,22 +144,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <None Include="jjuggumi.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="canvas.c" />
-    <ClCompile Include="jebi.c" />
-    <ClCompile Include="jjuggumi.c" />
-    <ClCompile Include="keyin.c" />
-    <ClCompile Include="mugunghwa.c" />
-    <ClCompile Include="sample.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="canvas.h" />
-    <ClInclude Include="jjuggumi.h" />
-    <ClInclude Include="keyin.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
