@@ -19,7 +19,7 @@ int jjuggumi_init(void) {
 	srand((unsigned int)time(NULL));
 
     FILE* fp;
-    fopen_s(&fp, "jjuggumi.dat", "r");
+    fopen_s(&fp, DATA_FILE, "r");
     if (fp == NULL) {
         return -1;
     }
