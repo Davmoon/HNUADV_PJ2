@@ -34,7 +34,7 @@ void jebi_init(void) {
 
 void print_jebi(void) {
 	for (int i = 0; i < PLAYER_MAX; i++) {
-		move_tail()
+		//move_tail()
 	}
 }
 
