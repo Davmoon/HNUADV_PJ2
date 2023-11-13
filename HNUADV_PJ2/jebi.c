@@ -12,12 +12,30 @@ void jebi_init(void);
 void jebi(void);
 void j_move_manual(key_t key);
 
-int px[PLAYER_MAX], py[PLAYER_MAX], pic[PLAYER_MAX]; // py, px 삭제 예정, 각 플레이어 선택
+int sel_jebi[PLAYER_MAX]; // 당첨 제비 구분 용도 0번: 플레이어 제외, 1번 살아있음, 2번 죽음 뽑기
+int round; //라운드 저장
 
 void jebi_init(void) {
-	map_init(5, 18);
+	map_init(5, 24);
+	
+	int len = 0;
+	for (int i = 0; i < PLAYER_MAX; i++) {
+		if (player[i].is_alive) {
+			sel_jebi[len] = 1;
+			len++;
+		}
+		else {
+			sel_jebi[len] = 0;
+		}
+	}
 
+	//print_jebi();
+}
 
+void print_jebi(void) {
+	for (int i = 0; i < PLAYER_MAX; i++) {
+		//move_tail()
+	}
 }
 
 void j_move_manual(key_t key) {
@@ -27,8 +45,10 @@ void j_move_manual(key_t key) {
 
 	int dir;  // 움직일 방향(0~3)
 	switch (key) {
-	case K_LEFT: dir = DIR_LEFT; break;
-	case K_RIGHT: dir = DIR_RIGHT; break;
+	case K_LEFT: dir = DIR_LEFT;
+		break;
+	case K_RIGHT: dir = DIR_RIGHT;
+		break;
 	default: return;
 	}
 
@@ -36,11 +56,11 @@ void j_move_manual(key_t key) {
 	int nx, ny, select;
 	nx = px[0] + dx[dir];
 	ny = py[0] + dy[dir];
-	if (select == (0 || 4)) {
+	//if (select == (0 || 4)) {
 		return;
-	}
+	//}
 
-	move_tail(0, nx, ny);
+	//move_tail(0, nx, ny);
 }
 
 void draw_jebi(void) {
