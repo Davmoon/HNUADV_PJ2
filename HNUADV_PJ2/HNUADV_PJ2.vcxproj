@@ -27,7 +27,9 @@
     <ClCompile Include="keyin.c" />
     <ClCompile Include="mugunghwa.c" />
     <ClCompile Include="nightgame.c" />
-    <ClCompile Include="sample.c" />
+    <ClCompile Include="sample.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="juldarigi.c" />
   </ItemGroup>
   <ItemGroup>
