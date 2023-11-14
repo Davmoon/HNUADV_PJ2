@@ -53,9 +53,9 @@ void j_move_manual(key_t key) {
 	}
 
 	// 움직여서 놓일 자리
-	int nx, ny, select;
-	nx = px[0] + dx[dir];
-	ny = py[0] + dy[dir];
+	//int nx, ny, select;
+	//nx = px[0] + dx[dir];
+	//ny = py[0] + dy[dir];
 	//if (select == (0 || 4)) {
 		return;
 	//}
