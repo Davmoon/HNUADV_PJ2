@@ -12,6 +12,7 @@ void jebi_init(void);
 void jebi(void);
 void j_move_manual(key_t key);
 void print_jebi(void);
+void move_jebi(int, int, int);
 
 // 당첨 제비 구분 용도 0번: 플레이어 제외, 1번 살아있음, 2번 죽음 뽑기
 int px[PLAYER_MAX], sel_jebi[PLAYER_MAX]; 
@@ -39,6 +40,7 @@ void print_jebi(void) {
 		if (sel_jebi[i] == (1 || 2)) {
 			back_buf[4][i * 2 + 2] = '?';
 		}
+		px[i] = 0; //처음 sel 좌표 0으로 초기화
 	}
 }
 
@@ -59,13 +61,14 @@ void j_move_manual(key_t key) {
 	int nx;
 	nx = px[0] + dx[dir];
 
-	//move_tail(0, nx, ny);
+	move_jebi(0, nx, 4);
 }
 
-void draw_jebi(void) {
-	for (int i = 0; i < 4; i++) {
-
-	}
+void move_jebi(int player, int nx, int ny) {
+	int p = player;  // 이름이 길어서...
+	back_buf[nx][ny] = back_buf[px[p]][4];
+	back_buf[px[p]][4] = '@';
+	px[p] = nx;
 }
 
 void jebi(void) {
