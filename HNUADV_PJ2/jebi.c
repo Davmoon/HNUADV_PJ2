@@ -46,7 +46,8 @@ void print_jebi(void) {
 
 void j_move_manual(key_t key) {
 	// 각 방향으로 움직일 때 x, y값 delta
-	static int dx[2] = { -1, 1};
+	static int dx[4] = { -1, 1, 0, 0 };
+	static int dy[4] = { 0, 0, -1, 1 };
 
 	int dir;  // 움직일 방향(0~3)
 	switch (key) {
@@ -59,16 +60,16 @@ void j_move_manual(key_t key) {
 
 	// 움직여서 놓일 자리
 	int nx;
-	nx = px[0] + dx[dir];
+	nx = px[0] + dx[dir*2];
 
-	move_jebi(0, nx, 4);
+	move_jebi(0, nx, 2);
 }
 
 void move_jebi(int player, int nx, int ny) {
-	int p = player;  // 이름이 길어서...
-	back_buf[nx][ny] = back_buf[px[p]][4];
-	back_buf[px[p]][4] = '@';
-	px[p] = nx;
+	//int p = player;  // 이름이 길어서...
+	back_buf[nx][ny] = back_buf[px[0]][2];
+	back_buf[px[0]][2] = ' ';
+	px[0] = nx;
 }
 
 void jebi(void) {
@@ -78,6 +79,8 @@ void jebi(void) {
 
 	//dialog("\"제비뽑기\"");
 	int round = 1;
+	px[0] = 4;
+	back_buf[px[0]][2] = '0' + 0;
 	
 	while (1) {
 
@@ -88,6 +91,6 @@ void jebi(void) {
 		else if (key != K_UNDEFINED) {
 			j_move_manual(key);
 		}
-
+		display();
 	}
 }
