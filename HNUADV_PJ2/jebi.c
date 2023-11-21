@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS //sprintf() 사용하기 위함 없으면 사이즈 지정해줘야함..
 #include "jjuggumi.h"
 #include "canvas.h"
 #include "keyin.h"
@@ -9,30 +10,35 @@
 #define DIR_RIGHT	3
 
 void jebi_init(void);
-void jebi(void);
+void fix_zero_curser();
 void j_move_manual(key_t key);
 bool jebi_placable(int, int);
-void print_jebi(void);
 void move_jebi(int, int, int);
-int kill(int, int*);
+void print_rp(int);
+void ck_kill(int*, bool);
+void jebi(void);
 
 // 당첨 제비 구분 용도 0번: 플레이어 제외, 1번 살아있음, 2번 죽음 뽑기
 int px[PLAYER_MAX], py[PLAYER_MAX];
-int count_r; //플레이어 체크, 라운드 체크
+int count_r; //라운드 카운터
+char msg[50] = { "player", };
 
 void jebi_init(void) {
 	map_init(9, 24);
-	print_jebi();
 
-	count_r = 0;
-	px[0] = 4; py[0] = 2;
-	back_buf[px[0]][py[0]] = '@';
-}
-
-void print_jebi(void) {
+	//제비 플레이어수만큼 나열
 	for (int i = 0; i < n_alive; i++) {
 		back_buf[4][i * 2 + 2] = '?';
 	}
+
+	count_r = 0;
+	fix_zero_curser();
+}
+
+void fix_zero_curser() {
+	count_r = 0;
+	px[0] = 4; py[0] = 2;
+	back_buf[px[0]][py[0]] = '@';
 }
 
 void j_move_manual(key_t key) {
@@ -74,13 +80,48 @@ void move_jebi(int player, int nx, int ny) {
 	py[p] = ny;
 }
 
-int kill(int tr, int* check_r) {
-	if (tr + 1 == *check_r) {
-		int kill = randint(0, n_player - 1);
-		(*check_r)++;
-		return kill;
-		/*gotoxy(9, 0);
-		printf("round %d, turn : player %d", count_r + 1, 0);*/
+void print_rp(int player) {
+	gotoxy(9, 0);
+	printf("round %d, turn: player %d", count_r + 1, player);
+}
+
+void ck_kill(int* sel_kill, bool space) {
+	//0번이 살아있는 경우 죽는지 확인
+	if (space && *sel_kill == 0) {
+		n_alive--;
+		player[0].is_alive = false;
+		dialog("player 0 fail!");
+
+		back_buf[px[0]][py[0]] = '?';
+		back_buf[4][n_alive * 2 + 2] = ' ';
+		count_r++;
+		
+		*sel_kill = randint(0, n_alive - 1);
+		return;
+	}
+	int count = 0;
+	for (int i = 0; i < PLAYER_MAX; i++) {
+		if (player[i].is_alive == true) {
+			if (i != 0) {
+				print_rp(i);
+				Sleep(1000);
+			}
+			if (count == *sel_kill) {
+				n_alive--;
+				player[i].is_alive = false;
+				sprintf(msg, "%s %d %s ", msg, i, "dead!");
+				dialog(msg);
+				msg[6] = '\0';//player 외 초기화
+
+				back_buf[px[0]][py[0]] = '?';
+				back_buf[4][n_alive * 2 + 2] = ' ';
+				count_r++;
+				*sel_kill = randint(0, n_alive - 1);
+				fix_zero_curser();
+				return;
+			}
+			count++;
+		}
 	}
 }
 
@@ -89,29 +130,32 @@ void jebi(void) {
 	system("cls");
 	display();
 	//dialog("\"제비뽑기\"");
-	int check_r = 1;
+	int sel_kill = randint(0, n_alive - 1);
 	
+
 	while (1) {
 
 		if (n_alive == 1) {
 			break;
 		}
 
-		kill(count_r, &check_r);
-
 		//0번이 살아있으면 작동
 		if (player[0].is_alive == true) {
+			int i = 0;
+			print_rp(i);
 			key_t key = get_key();
 			if (key == K_QUIT) {
 				break;
 			}
 			else if (key == K_SPACE) {
-				gotoxy(10, 0);
-				printf("hello");
+				ck_kill(&sel_kill, true);
 			}
 			else if (key != K_UNDEFINED) {
 				j_move_manual(key);
 			}
+		}
+		else {
+			ck_kill(&sel_kill, false);
 		}
 
 		display();
