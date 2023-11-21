@@ -14,6 +14,7 @@ void j_move_manual(key_t key);
 bool jebi_placable(int, int);
 void print_jebi(void);
 void move_jebi(int, int, int);
+int kill(int, int*);
 
 // 당첨 제비 구분 용도 0번: 플레이어 제외, 1번 살아있음, 2번 죽음 뽑기
 int px[PLAYER_MAX], py[PLAYER_MAX];
@@ -49,11 +50,10 @@ void j_move_manual(key_t key) {
 	nx = px[0];
 	ny = py[0] + dy[dir] * 2;
 	if (!jebi_placable(nx, ny)) {
-		return false;
+		return;
 	}
 
 	move_jebi(0, nx, ny);
-	return true;
 }
 
 // 살아있는 플레이어 수보다 더 나가지 않도록 count_p와 검증
@@ -74,11 +74,22 @@ void move_jebi(int player, int nx, int ny) {
 	py[p] = ny;
 }
 
+int kill(int tr, int* check_r) {
+	if (tr + 1 == *check_r) {
+		int kill = randint(0, n_player - 1);
+		(*check_r)++;
+		return kill;
+		/*gotoxy(9, 0);
+		printf("round %d, turn : player %d", count_r + 1, 0);*/
+	}
+}
+
 void jebi(void) {
 	jebi_init();
 	system("cls");
 	display();
 	//dialog("\"제비뽑기\"");
+	int check_r = 1;
 	
 	while (1) {
 
@@ -86,16 +97,21 @@ void jebi(void) {
 			break;
 		}
 
-		key_t key = get_key();
-		if (key == K_QUIT) {
-			break;
-		}
-		else if (key == K_SPACE) {
-			gotoxy(10, 0);
-			printf("hello");
-		}
-		else if (key != K_UNDEFINED) {
-			j_move_manual(key);
+		kill(count_r, &check_r);
+
+		//0번이 살아있으면 작동
+		if (player[0].is_alive == true) {
+			key_t key = get_key();
+			if (key == K_QUIT) {
+				break;
+			}
+			else if (key == K_SPACE) {
+				gotoxy(10, 0);
+				printf("hello");
+			}
+			else if (key != K_UNDEFINED) {
+				j_move_manual(key);
+			}
 		}
 
 		display();

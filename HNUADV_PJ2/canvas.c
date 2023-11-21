@@ -85,8 +85,9 @@ void print_status(void) {
 			player[p].item.intel_buf,
 			player[p].str,
 			player[p].item.str_buf,
-			player[p].stamina,
-			player[p].item.stamina_buf);
+			player[p].stamina
+			//player[p].item.stamina_buf
+			);
 	}
 }
 
