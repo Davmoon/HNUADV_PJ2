@@ -21,10 +21,9 @@ int count_r; //플레이어 체크, 라운드 체크
 
 void jebi_init(void) {
 	map_init(9, 24);
-	
-	count_r = 0;
 	print_jebi();
 
+	count_r = 0;
 	px[0] = 4; py[0] = 2;
 	back_buf[px[0]][py[0]] = '@';
 }
@@ -36,8 +35,6 @@ void print_jebi(void) {
 }
 
 void j_move_manual(key_t key) {
-	// 각 방향으로 움직일 때 x, y값 delta
-	static int dx[4] = { -1, 1, 0, 0 };
 	static int dy[4] = { 0, 0, -1, 1 };
 
 	int dir;  // 상하 키 입력 제거
@@ -93,18 +90,16 @@ void jebi(void) {
 		if (key == K_QUIT) {
 			break;
 		}
+		else if (key == K_SPACE) {
+			gotoxy(10, 0);
+			printf("hello");
+		}
 		else if (key != K_UNDEFINED) {
 			j_move_manual(key);
 		}
 
-		if (player[0].is_alive == false) {
-
-		}
-		else if (player[0].is_alive == true) {
-
-		}
-
-
 		display();
+		Sleep(10);
+		tick += 10;
 	}
 }
