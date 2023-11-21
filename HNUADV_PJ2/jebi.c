@@ -36,7 +36,6 @@ void jebi_init(void) {
 }
 
 void fix_zero_curser() {
-	count_r = 0;
 	px[0] = 4; py[0] = 2;
 	back_buf[px[0]][py[0]] = '@';
 }
@@ -120,6 +119,9 @@ void ck_kill(int* sel_kill, bool space) {
 				fix_zero_curser();
 				return;
 			}
+			sprintf(msg, "%s %d %s ", msg, i, "pass!");
+			dialog(msg);
+			msg[6] = '\0';//player 외 초기화
 			count++;
 		}
 	}
