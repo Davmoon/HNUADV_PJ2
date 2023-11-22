@@ -85,18 +85,6 @@ void print_rp(int player) {
 }
 
 void ck_kill(int* sel_kill, bool space) {
-	//0번이 살아있는 경우 죽는지 확인
-	/*if (space && *sel_kill == 0) {
-		n_alive--;
-		player[0].is_alive = false;
-		dialog("player 0 fail!");
-
-		back_buf[px[0]][py[0]] = '?';
-		back_buf[4][n_alive * 2 + 2] = ' ';
-		count_r++;
-		
-		*sel_kill = randint(0, n_alive - 1);
-	}*/
 	int count = 0;
 	for (int i = 0; i < PLAYER_MAX; i++) {
 		if (player[i].is_alive == true && i != 0) {
@@ -109,12 +97,6 @@ void ck_kill(int* sel_kill, bool space) {
 			sprintf(msg, "%s %d %s ", msg, i, "dead!");
 			dialog(msg);
 			msg[6] = '\0';//player 외 초기화
-	
-			//if (i == 0) {
-				//back_buf[px[0]][py[0]] = '?';
-			//}
-			//fix_zero_cursor();
-			//back_buf[4][(n_alive - count) * 2 + 2] = ' ';
 
 			count_r++;
 			count++;
@@ -132,6 +114,7 @@ void ck_kill(int* sel_kill, bool space) {
 			count++;
 		}
 	}
+	//라운드 끝나면 '?' 출력 초기화
 	for (int i = 0; i < PLAYER_MAX; i++) {
 		back_buf[4][i * 2 + 2] = ' ';
 	}
@@ -145,7 +128,7 @@ void jebi(void) {
 	jebi_init();
 	system("cls");
 	display();
-	//dialog("\"제비뽑기\"");
+	dialog("\"제비뽑기 게임 start!\"");
 	int sel_kill = randint(0, n_alive - 1);
 	
 
