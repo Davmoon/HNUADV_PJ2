@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClCompile Include="canvas.c" />
     <ClCompile Include="jebi.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="jjuggumi.c" />
     <ClCompile Include="keyin.c" />

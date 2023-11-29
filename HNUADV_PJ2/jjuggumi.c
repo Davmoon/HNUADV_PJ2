@@ -107,8 +107,8 @@ int main(void) {
     //intro();
 	jjuggumi_init();//인원 입력 함수
     //sample();
-	mugunghwa();
-	//nightgame();
+	//mugunghwa();
+	nightgame();
 	//juldarigi();
 	//jebi();
 	ending();
