@@ -11,6 +11,7 @@
 void ng_init();
 void ngmv_random(int, int);
 bool ngmv_manual(key_t);
+void nightgame();
 
 int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX];
 
@@ -34,7 +35,7 @@ void ng_init(void) {
 	}
 
 	//item 랜덤 배치
-	for (int i = 0; i < n_player ; i++) {
+	for (int i = 0; i < n_player; i++) {
 		do {
 			x = randint(1, N_ROW - 2);
 			y = randint(1, N_COL - 2);
@@ -42,7 +43,7 @@ void ng_init(void) {
 		itmx[i] = x;
 		itmy[i] = y;
 
-		back_buf[itmx[i]][itmy[i]] = 'I';  // 아이템은 항상 i로 표기
+		back_buf[itmx[i]][itmy[i]] = '?';  // 아이템은 항상 i로 표기
 	}
 
 	tick = 0;
@@ -89,16 +90,7 @@ void ngmv_random(int player, int dir) {
 	move_tail(p, nx, ny);
 }
 
-// back_buf[][]에 기록
-void move_tail(int player, int nx, int ny) {
-	int p = player;  // 이름이 길어서...
-	back_buf[nx][ny] = back_buf[px[p]][py[p]];
-	back_buf[px[p]][py[p]] = ' ';
-	px[p] = nx;
-	py[p] = ny;
-}
-
-void sample(void) {
+void nightgame(void) {
 	sample_init();
 	system("cls");
 	display();
