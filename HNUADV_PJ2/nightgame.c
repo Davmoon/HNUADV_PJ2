@@ -2,6 +2,7 @@
 #include "canvas.h"
 #include "keyin.h"
 #include <stdio.h>
+#include <math.h>
 
 #define DIR_UP		0
 #define DIR_DOWN	1
@@ -10,8 +11,8 @@
 
 void ng_init();
 void ngmv_random(int, int);
-bool ngmv_manual(key_t);
 void nightgame();
+void ck_near_item();
 
 int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX];
 
@@ -35,7 +36,7 @@ void ng_init(void) {
 	}
 
 	//item 랜덤 배치
-	for (int i = 0; i < n_player; i++) {
+	for (int i = 0; i < n_alive - 1; i++) {
 		do {
 			x = randint(1, N_ROW - 2);
 			y = randint(1, N_COL - 2);
@@ -43,36 +44,10 @@ void ng_init(void) {
 		itmx[i] = x;
 		itmy[i] = y;
 
-		back_buf[itmx[i]][itmy[i]] = '?';  // 아이템은 항상 i로 표기
+		back_buf[itmx[i]][itmy[i]] = 'I';  // 아이템은 항상 i로 표기
 	}
 
 	tick = 0;
-}
-
-bool ngmv_manual(key_t key) {
-	// 각 방향으로 움직일 때 x, y값 delta
-	static int dx[4] = { -1, 1, 0, 0 };
-	static int dy[4] = { 0, 0, -1, 1 };
-
-	int dir;  // 움직일 방향(0~3)
-	switch (key) {
-	case K_UP: dir = DIR_UP; break;
-	case K_DOWN: dir = DIR_DOWN; break;
-	case K_LEFT: dir = DIR_LEFT; break;
-	case K_RIGHT: dir = DIR_RIGHT; break;
-	default: return;
-	}
-
-	// 움직여서 놓일 자리
-	int nx, ny;
-	nx = px[0] + dx[dir];
-	ny = py[0] + dy[dir];
-	if (!placable(nx, ny)) {
-		return false;
-	}
-
-	move_tail(0, nx, ny);
-	return true;
 }
 
 // 0 <= dir < 4가 아니면 랜덤
@@ -90,8 +65,36 @@ void ngmv_random(int player, int dir) {
 	move_tail(p, nx, ny);
 }
 
+void ck_near_item() {
+	double len = 0;
+
+	for (int k= 1; k< n_player; k++) {
+		if (player[k].is_alive == true) {
+
+			//가장 긴 길이 체크
+			for (int i = 0; i < n_alive - 2; i++) {
+				for (int j = 1; j < n_alive - 1; j++) {
+					int dx = itmx[i]; int dy = itmy[i];
+					int xx = px[i]; int yy = py[i];
+
+					int x = (dx - xx) * (dx - xx);
+					int y = (dy - yy) * (dy - yy);
+					double lena = sqrt(x + y);
+
+					if (lena > len) {
+						len = lena;
+					}
+				}
+			}
+		}
+	}
+
+
+	
+}
+
 void nightgame(void) {
-	sample_init();
+	ng_init();
 	system("cls");
 	display();
 
@@ -108,11 +111,7 @@ void nightgame(void) {
 		}
 
 		// player 1 부터는 랜덤으로 움직임(8방향)
-		for (int i = 1; i < n_player; i++) {
-			if (tick % period[i] == 0) {
-				move_random(i, -1);
-			}
-		}
+		
 
 		display();
 		Sleep(10);
