@@ -43,7 +43,8 @@ void ng_init(void) {
 		itmx[i] = x;
 		itmy[i] = y;
 
-		back_buf[itmx[i]][itmy[i]] = '?';  // 아이템은 항상 i로 표기
+		back_buf[itmx[i]][itmy[i]] = 'I';  // 아이템은 항상 i로 표기
+		
 	}
 
 	tick = 0;
@@ -93,8 +94,10 @@ void ngmv_random(int player, int dir) {
 void nightgame(void) {
 	sample_init();
 	system("cls");
+	ng_init();
 	display();
 
+	printf("%s", item[0].name);
 	while (1) {
 		// player 0만 손으로 움직임(4방향)
 		key_t key = get_key();
@@ -118,4 +121,4 @@ void nightgame(void) {
 		Sleep(10);
 		tick += 10;
 	}
-}//bhbyu
+}
