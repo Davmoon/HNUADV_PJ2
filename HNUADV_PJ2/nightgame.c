@@ -14,11 +14,10 @@ void ngmv_random(int, int);
 bool ngmv_manual(key_t);
 void nightgame();
 
-int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX];
+int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX], curr_itmx[PLAYER_MAX], curr_itmy[PLAYER_MAX];
 
 void ng_init(void) {
 	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
-
 	int x, y;
 	for (int i = 0; i < n_player; i++) {
 		// 같은 자리가 나오면 다시 생성
@@ -34,7 +33,7 @@ void ng_init(void) {
 			back_buf[px[i]][py[i]] = '0' + i;  // (0 .. n_player-1)
 		}
 	}
-
+	
 	//item 랜덤 배치
 	for (int i = 0; i < n_player; i++) {
 		do {
@@ -45,6 +44,10 @@ void ng_init(void) {
 		itmy[i] = y;
 
 		back_buf[itmx[i]][itmy[i]] = 'I';  // 아이템은 항상 i로 표기
+	}
+	for (int i = 0; i < n_player; i++) {
+		curr_itmx[i] = -1;
+		curr_itmy[i] = -1;
 	}
 
 	tick = 0;
@@ -160,7 +163,10 @@ void nightgame(void) {
 				// 플레이어가 아이템과 인접한지 확인
 				if (abs(px[i] - itmx[j]) + abs(py[i] - itmy[j]) == 1 && itmx[j] != -1) {
 					if (!player[i].hasitem) {
-						player[i].hasitem = true; // 아이템 획득
+						player[i].hasitem = true;
+						curr_itmx[i] = itmx[j];
+						curr_itmy[i] = itmy[j];
+						// 아이템 획득
 						printf("Player %d acquired item at (%d, %d)\n", i, itmx[j], itmy[j]);
 						// 아이템을 맵에서 제거
 						back_buf[itmx[j]][itmy[j]] = ' '; // 아이템 위치를 공백으로 변경
@@ -186,12 +192,12 @@ void nightgame(void) {
 							}
 
 						}
-
 						if (exchange) {
-							// 아이템 교환 로직
+							back_buf[curr_itmx[i]][curr_itmy[i]] = 'I'; // 이전 아이템 위치에 아이템 표시
+							// 새 아이템의 위치를 현재 아이템 위치로 업데이트
+							curr_itmx[i] = itmx[j];
+							curr_itmy[i] = itmy[j];
 							printf("Player %d exchanged item at (%d, %d)\n", i, itmx[j], itmy[j]);
-							// 이전 아이템을 맵에 놓고 새 아이템을 장착하는 코드 추가
-							// 아이템을 맵에서 제거
 							back_buf[itmx[j]][itmy[j]] = ' '; // 아이템 위치를 공백으로 변경
 							itmx[j] = -1; // 아이템 위치를 유효하지 않은 값으로 설정
 							itmy[j] = -1;
@@ -200,7 +206,6 @@ void nightgame(void) {
 				}
 			}
 		}
-	
 		display();
 		Sleep(10);
 		tick += 10;
