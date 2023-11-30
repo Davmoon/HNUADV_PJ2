@@ -143,4 +143,4 @@ void dialog(char message[]) {
 
 	display();
 	//Sleep(2000); // 정지하는 상태인지 파악하기 위한 TEST CODE
-}
+}//sdfasdf
