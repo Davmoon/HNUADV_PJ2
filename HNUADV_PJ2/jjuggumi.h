@@ -4,8 +4,8 @@
 #include <Windows.h>
 #include <stdbool.h>
 
-#define PLAYER_MAX		10
-#define ITEM_MAX	10
+#define PLAYER_MAX 10
+#define ITEM_MAX 10
 
 typedef struct {
 	char name[100];

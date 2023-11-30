@@ -9,7 +9,7 @@
 #define DIR_RIGHT	3
 
 void ng_init();
-void ngmv_random(int, int);
+void ngmv_towards_item(int, int);
 bool ngmv_manual(key_t);
 void nightgame();
 
@@ -49,6 +49,72 @@ void ng_init(void) {
 
 	tick = 0;
 }
+int find_nearest_item(int player) {
+	int min_distance = INT_MAX;
+	int nearest_item = -1;
+
+	for (int i = 0; i < n_item; i++) {
+		int distance = abs(itmx[i] - px[player]) + abs(itmy[i] - py[player]);
+		if (distance < min_distance) {
+			min_distance = distance;
+			nearest_item = i;
+		}
+	}
+
+	return nearest_item;
+}
+
+// 플레이어가 아이템 칸에 도착했을 때의 상호작용
+void interaction_with_item(int player_index, int item_index) {
+	if (player[player_index].hasitem == false) {
+		// 아이템을 획득한다.
+		player[player_index].item = item[item_index];
+		player[player_index].hasitem = true;
+		printf("%s 플레이어가 %s 아이템을 획득하였습니다.\n", player[player_index].name, item[item_index].name);
+	}
+	else {
+		// 아이템을 교환한다.
+		if (player_index == 0) {
+			printf("\n교환하시겠습니까? (y/n)\n");
+			char key = get_key();
+			if (key == 'y') {
+				ITEM temp = player[player_index].item;
+				player[player_index].item = item[item_index];
+				item[item_index] = temp;
+				printf("%s 플레이어가 아이템을 교환하였습니다.\n", player[player_index].name);
+			}
+		}
+		else {
+			int rand = randint(0, 1);
+			if (rand == 1) {
+				ITEM temp = player[player_index].item;
+				player[player_index].item = item[item_index];
+				item[item_index] = temp;
+				printf("%s 플레이어가 아이템을 교환하였습니다.\n", player[player_index].name);
+			}
+		}
+	}
+}
+// 플레이어간의 상호작용
+void interaction_between_players(int player1_index, int player2_index) {
+	printf("플레이어 %s와 %s가 만났습니다.\n", player[player1_index].name, player[player2_index].name);
+	if (player1_index == 0 || (!player[player1_index].hasitem && player[player2_index].hasitem)) {
+		printf("\n1) 강탈시도 2) 회유시도 3) 무시\n");
+		char key = get_key();
+		if (key == '1') {
+			// 강탈시도 로직
+		}
+		else if (key == '2') {
+			// 회유시도 로직
+		}
+		else {
+			// 무시 로직
+		}
+	}
+	else {
+		// 나머지 플레이어들에 대한 로직
+	}
+}
 
 bool ngmv_manual(key_t key) {
 	// 각 방향으로 움직일 때 x, y값 delta
@@ -73,23 +139,50 @@ bool ngmv_manual(key_t key) {
 	}
 
 	move_tail(0, nx, ny);
+
+	// 아이템과의 상호작용 확인
+	for (int i = 0; i < n_item; i++) {
+		if (nx == itmx[i] && ny == itmy[i]) {
+			// player0가 아이템 위에 도착한 경우
+			printf("Player0 is on the item!\n");  // 디버깅 메시지 추가
+			interaction_with_item(0, i);
+		}
+	}
 	return true;
 }
-
-// 0 <= dir < 4가 아니면 랜덤
-void ngmv_random(int player, int dir) {
-	int p = player;  // 이름이 길어서...
-	int nx, ny;  // 움직여서 다음에 놓일 자리
-
-	// 움직일 공간이 없는 경우는 없다고 가정(무한 루프에 빠짐)	
-
-	do {
-		nx = px[p] + randint(-1, 1);
-		ny = py[p] + randint(-1, 1);
-	} while (!placable(nx, ny));
-
-	move_tail(p, nx, ny);
+bool is_player_on_item(int player) {
+	for (int i = 0; i < n_item; i++) {
+		if (px[player] == itmx[i] && py[player] == itmy[i]) {
+			return true;
+		}
+	}
+	return false;
 }
+
+
+//아이템 방향으로 움직이기
+void ngmv_towards_item(int player, int item) {
+	int dx = itmx[item] - px[player];
+	int dy = itmy[item] - py[player];
+
+	if (abs(dx) > abs(dy)) {
+		if (dx > 0) {
+			move_tail(player, px[player] + 1, py[player]);
+		}
+		else {
+			move_tail(player, px[player] - 1, py[player]);
+		}
+	}
+	else {
+		if (dy > 0) {
+			move_tail(player, px[player], py[player] + 1);
+		}
+		else {
+			move_tail(player, px[player], py[player] - 1);
+		}
+	}
+}
+
 
 void nightgame(void) {
 	sample_init();
@@ -98,6 +191,10 @@ void nightgame(void) {
 	display();
 
 	printf("%s", item[0].name);
+	printf("%s", item[1].name);
+	printf("%s", item[2].name);
+	printf("%s", item[3].name);
+	printf("%s", item[4].name);
 	while (1) {
 		// player 0만 손으로 움직임(4방향)
 		key_t key = get_key();
@@ -106,19 +203,36 @@ void nightgame(void) {
 		}
 		else if (key != K_UNDEFINED) {
 
-			move_manual(key);
+			ngmv_manual(key);
 
 		}
 
-		// player 1 부터는 랜덤으로 움직임(8방향)
+		// player 1 부터는 아이템을 향해 움직임
 		for (int i = 1; i < n_player; i++) {
 			if (tick % period[i] == 0) {
-				move_random(i, -1);
+				int nearest_item = find_nearest_item(i);
+				ngmv_towards_item(i, nearest_item);
+			}
+		}
+		// 아이템이나 플레이어와의 상호작용을 확인
+		for (int i = 0; i < n_player; i++) {
+			for (int j = 0; j < n_item; j++) {
+				if (px[i] == itmx[j] && py[i] == itmy[j]) {
+					// 플레이어가 아이템 칸에 도착한 경우
+					interaction_with_item(i, j);
+				}
+			}
+			for (int j = i + 1; j < n_player; j++) {
+				if (px[i] == px[j] && py[i] == py[j]) {
+					// 두 플레이어가 같은 칸에 있는 경우
+					interaction_between_players(i, j);
+				}
 			}
 		}
 
 		display();
 		Sleep(10);
 		tick += 10;
+
 	}
 }
