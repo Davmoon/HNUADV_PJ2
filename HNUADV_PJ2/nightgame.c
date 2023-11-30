@@ -158,7 +158,7 @@ void nightgame(void) {
 		for (int i = 0; i < n_player; i++) {
 			for (int j = 0; j < n_item; j++) {
 				// 플레이어가 아이템과 인접한지 확인
-				if (abs(px[i] - itmx[j]) + abs(py[i] - itmy[j]) == 1) {
+				if (abs(px[i] - itmx[j]) + abs(py[i] - itmy[j]) == 1 && itmx[j] != -1) {
 					if (!player[i].hasitem) {
 						player[i].hasitem = true; // 아이템 획득
 						printf("Player %d acquired item at (%d, %d)\n", i, itmx[j], itmy[j]);
@@ -166,7 +166,6 @@ void nightgame(void) {
 						back_buf[itmx[j]][itmy[j]] = ' '; // 아이템 위치를 공백으로 변경
 						itmx[j] = -1; // 아이템 위치를 유효하지 않은 값으로 설정
 						itmy[j] = -1;
-						break;
 					}else {
 						// 교환 로직 실행
 						bool exchange = false;
@@ -176,31 +175,27 @@ void nightgame(void) {
 							if (decision == 'Y' || decision == 'y') {
 								exchange = true;
 							}
-							else if (decision == 'N' || decision == 'n')
-							{
+							else if (decision == 'N' || decision == 'n') {
 								//무시하는 코드 추가
 								printf("Player %d ignored item at (%d, %d)\n", i, itmx[j], itmy[j]);
+								continue;
 							}
-							else
-							{
-								printf("잘못된 입력입니다.");
-							}
-						}
-						else { // 나머지 플레이어
-							if (randint(0, 1)) { // 50% 확률
+						} else {
+							if (randint(0, 1)) {
 								exchange = true;
 							}
+
 						}
+
 						if (exchange) {
 							// 아이템 교환 로직
 							printf("Player %d exchanged item at (%d, %d)\n", i, itmx[j], itmy[j]);
 							// 이전 아이템을 맵에 놓고 새 아이템을 장착하는 코드 추가
+							// 아이템을 맵에서 제거
+							back_buf[itmx[j]][itmy[j]] = ' '; // 아이템 위치를 공백으로 변경
+							itmx[j] = -1; // 아이템 위치를 유효하지 않은 값으로 설정
+							itmy[j] = -1;
 						}
-						// 아이템을 맵에서 제거
-						back_buf[itmx[j]][itmy[j]] = ' '; // 아이템 위치를 공백으로 변경
-						itmx[j] = -1; // 아이템 위치를 유효하지 않은 값으로 설정
-						itmy[j] = -1;
-
 					}
 				}
 			}
