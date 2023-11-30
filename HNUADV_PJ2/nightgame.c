@@ -118,4 +118,4 @@ void nightgame(void) {
 		Sleep(10);
 		tick += 10;
 	}
-}
+}//bhbyu
