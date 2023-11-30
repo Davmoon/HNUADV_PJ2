@@ -10,10 +10,12 @@ bool is_valid(key_t key) {
 		K_DOWN,
 		K_LEFT,
 		K_RIGHT,
-		K_QUIT
+		K_QUIT,
+		L_PULL,
+		R_PULL
 	};
 
-	for (int i = 0; i < N_KEY; i++) { // UNDEFINED 포함 6개 키
+	for (int i = 0; i < N_KEY; i++) { // UNDEFINED 포함 개
 		if (key_list[i] == key) {
 			return true;
 		}
