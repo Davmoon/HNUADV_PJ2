@@ -116,24 +116,25 @@ void find_nearest_target(int p, int* target_x, int* target_y) {
 
 
 //이동 주기 및 로직 업데이트
-void ngmv_random(int p) {
-	int target_x, target_y;
-	find_nearest_target(p, &target_x, &target_y);
+void ngmv_random(int p, int chance) {
+	if (chance == -1) {
+		int target_x, target_y;
+		find_nearest_target(p, &target_x, &target_y);
 
-	// 가장 가까운 목표를 향해 이동
-	int nx = px[p], ny = py[p];
-	if (px[p] < target_x) nx++;
-	else if (px[p] > target_x) nx--;
+		// 가장 가까운 목표를 향해 이동
+		int nx = px[p], ny = py[p];
+		if (px[p] < target_x) nx++;
+		else if (px[p] > target_x) nx--;
 
-	if (py[p] < target_y) ny++;
-	else if (py[p] > target_y) ny--;
+		if (py[p] < target_y) ny++;
+		else if (py[p] > target_y) ny--;
 
-	// 이동 가능 여부 확인
-	if (placable(nx, ny)) {
-		move_tail(p, nx, ny);
+		// 이동 가능 여부 확인
+		if (placable(nx, ny)) {
+			move_tail(p, nx, ny);
+		}
 	}
 }
-
 
 void nightgame(void) {
 	sample_init();
@@ -178,20 +179,21 @@ void nightgame(void) {
 						if (i == 0) { // 플레이어 0
 							printf("교환하려면 Y를, 그렇지 않으면 N을 누르세요: ");
 
-							key_t key = get_key();
-							if (key == K_ALL) {
-								exchange = true;
-	
-							}
-							else if (key == K_NONE) {
-								printf("Player %d ignored item at (%d, %d)\n", i, itmx[j], itmy[j]);
-								continue;
-							}
+							char userInput;
+							scanf_s(" %c", &userInput); // 표준 입력 함수 사용
 
+							if (userInput == 'Y' || userInput == 'y') {
+								exchange = true;
+							}
+							else if (userInput == 'N' || userInput == 'n') {
+								printf("Player %d ignored item at (%d, %d)", i, itmx[j], itmy[j]);
+									continue;
+							}
+						}
 							//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 							//!!!!!!!!!!! 여기를 교수님 sample 코드처럼 get key로 바꾸세요.
 						
-						} else {
+						 else {
 							if (randint(0, 1)) {
 								exchange = true;
 							}
