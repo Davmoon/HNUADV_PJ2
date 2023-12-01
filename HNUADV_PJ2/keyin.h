@@ -12,8 +12,8 @@
 #define K_DOWN		80
 #define K_LEFT		75
 #define K_RIGHT		77
-#define K_NONE		79
-#define K_ALL		89
+#define K_NO		'n'
+#define K_YES		'y'
 #define K_QUIT		'q'
 #define K_UNDEFINED	'\0'
 
