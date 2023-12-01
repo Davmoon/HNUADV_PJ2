@@ -10,6 +10,7 @@ bool is_valid(key_t key) {
 		K_DOWN,
 		K_LEFT,
 		K_RIGHT,
+		K_NONE,
 		K_QUIT
 	};
 

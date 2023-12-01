@@ -177,6 +177,11 @@ void nightgame(void) {
 						bool exchange = false;
 						if (i == 0) { // 플레이어 0
 							printf("교환하려면 Y를, 그렇지 않으면 N을 누르세요: ");
+
+
+
+							//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							//!!!!!!!!!!! 여기를 교수님 sample 코드처럼 get key로 바꾸세요.
 							char decision = getchar();
 							if (decision == 'Y' || decision == 'y') {
 								exchange = true;
