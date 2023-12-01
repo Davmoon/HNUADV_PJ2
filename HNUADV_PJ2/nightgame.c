@@ -144,7 +144,7 @@ void pickup_item(int player_id) {
 
             // 아이템 획득 다이얼로그 표시
             char message[100];
-            sprintf_s(message, sizeof(message), "Player %d 획득했습니다. %s", player_id, item[i].name);
+            sprintf_s(message, sizeof(message), "Player %d: %s를 획득했습니다.", player_id, item[i].name);
             dialog(message);
             break;
         }
@@ -155,7 +155,7 @@ void pickup_item(int player_id) {
 void exchange_item(int player_id) {
     for (int i = 0; i < n_item; i++) {
         // 플레이어와 아이템이 같은 위치에 있는지 확인
-        if (px[player_id] == itmx[i] && py[player_id] == itmy[i]) {
+        if (px[player_id] == itmx[i] && py[player_id] == itmy[i] && player[player_id].hasitem) {
             bool exchange = false;
 
             // 플레이어 0이면 키보드 입력으로 결정
@@ -171,14 +171,32 @@ void exchange_item(int player_id) {
             }
 
             if (exchange) {
+                // 새로운 무작위 위치 생성
+                int new_item_x, new_item_y;
+                do {
+                    new_item_x = randint(1, N_ROW - 2);
+                    new_item_y = randint(1, N_COL - 2);
+                } while (!placable(new_item_x, new_item_y));
+
                 // 아이템 교환
                 ITEM temp = player[player_id].item;
                 player[player_id].item = item[i];
                 item[i] = temp;
 
+                // 기존 아이템 위치에 새 아이템 배치
+                itmx[i] = new_item_x;
+                itmy[i] = new_item_y;
+                back_buf[new_item_x][new_item_y] = 'I';
+
+                // 플레이어 위치 업데이트
+                back_buf[py[player_id]][px[player_id]] = '0' + player_id;
+
+                // 교환 여부 표시
+                player[player_id].exchanged = true;
+
                 // 교환 다이얼로그 표시
                 char message[100];
-                sprintf_s(message, sizeof(message), "Player %d교환 %s with %s", player_id, temp.name, player[player_id].item.name);
+                sprintf_s(message, sizeof(message), "Player %d: %s 를 %s로 교환했습니다.", player_id, temp.name, player[player_id].item.name);
                 dialog(message);
             }
             break;

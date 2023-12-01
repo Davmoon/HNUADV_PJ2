@@ -21,6 +21,7 @@ typedef struct {
 
 	bool is_alive;
 	bool hasitem;
+	bool exchanged;
 	ITEM item;
 }PLAYER;
 
