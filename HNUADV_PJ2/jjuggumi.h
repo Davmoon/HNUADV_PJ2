@@ -23,6 +23,7 @@ typedef struct {
 	bool hasitem;
 	bool exchanged;
 	ITEM item;
+	bool interacted;  // 이 턴에 상호작용했는지 여부
 }PLAYER;
 
 PLAYER player[PLAYER_MAX];  // 기본값 true, 탈락하면 false
