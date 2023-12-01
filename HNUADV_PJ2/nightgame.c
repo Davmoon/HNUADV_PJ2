@@ -203,68 +203,97 @@ void reset_interactions() {
     }
 }
 
+//강탈시도 로직
+void perform_robbery(int player_id, int other_player_id) {
+    if (player[player_id].str > player[other_player_id].str) {
+        // 성공 로직
+        printf("강탈 성공!\n");
+        // 아이템 교환 로직
+        if (player[other_player_id].hasitem) {
+            ITEM temp = player[player_id].item;
+            player[player_id].item = player[other_player_id].item;
+            player[other_player_id].item = temp;
+            player[player_id].hasitem = true;
+            player[other_player_id].hasitem = false;
+        }
+        // 스태미나 조정
+        player[player_id].stamina = max(0, player[player_id].stamina - 40);
+    }
+    else {
+        // 실패 로직
+        printf("강탈 실패...\n");
+        // 스태미나 조정 로직
+        player[player_id].stamina = max(0, player[player_id].stamina - 60);
+    }
+}
+
+//회유시도 로직
+void perform_persuasion(int player_id, int other_player_id) {
+    if (player[player_id].intel > player[other_player_id].intel) {
+        // 성공 로직
+        printf("회유 성공!\n");
+        // 아이템 교환 로직(아이템이 있다면)
+        if (player[other_player_id].hasitem) {
+            ITEM temp = player[player_id].item;
+            player[player_id].item = player[other_player_id].item;
+            player[other_player_id].item = temp;
+            player[player_id].hasitem = true;
+            player[other_player_id].hasitem = false;
+        }
+        // 스태미나 조정 로직
+        player[player_id].stamina = max(0, player[player_id].stamina - 20);
+    }
+    else {
+        // 회유 실패 로직
+        printf("회유 실패...\n");
+        // 스태미나 조정 로직
+        player[player_id].stamina = max(0, player[player_id].stamina - 40);
+    }
+}
+
+
 void handle_interaction(int player_id, int other_player_id) {
-    printf("Player %d interacts with Player %d\n", player_id, other_player_id);
+    // 플레이어 0과의 상호작용
+    if (player_id == 0 || other_player_id == 0) {
+        printf("Player %d 가 Player%d 에게 상호작용을 합니다. \n", player_id, other_player_id);
 
-    // 상호작용 선택지 제공
-    printf("1) 강탈시도\n");
-    printf("2) 회유시도\n");
-    printf("3) 무시\n");
-    printf("선택: ");
-    int choice;
-    scanf_s("%d", &choice);
-    getchar(); // 입력 버퍼 비우기
+        // 상호작용 선택지 제공
+        printf("1) 강탈시도\n");
+        printf("2) 회유시도\n");
+        printf("3) 무시\n");
+        printf("선택: ");
+        int choice;
+        scanf_s("%d", &choice);
+        getchar(); // 입력 버퍼 비우기
 
-    switch (choice) {
-    case 1: // 강탈시도
-        if (player[player_id].str > player[other_player_id].str) {
-            // 성공 로직
-            printf("강탈 성공!\n");
-            // 아이템 교환 로직
-            if (player[other_player_id].hasitem) {
-                ITEM temp = player[player_id].item;
-                player[player_id].item = player[other_player_id].item;
-                player[other_player_id].item = temp;
-                player[player_id].hasitem = true;
-                player[other_player_id].hasitem = false;
-            }
-            // 스태미나 조정
-            player[player_id].stamina = max(0, player[player_id].stamina - 40);
+        switch (choice) {
+        case 1: // 강탈시도
+            perform_robbery(player_id, other_player_id);
+            break;
+        case 2: // 회유시도
+            perform_persuasion(player_id, other_player_id);
+            break;
+        case 3: // 무시
+            printf("상호작용을 무시합니다.\n");
+            break;
+        default:
+            printf("잘못된 선택입니다.\n");
         }
-        else {
-            // 실패 로직
-            printf("강탈 실패...\n");
-            // 스태미나 조정 로직
-            player[player_id].stamina = max(0, player[player_id].stamina - 60);
+    } else {
+        // 플레이어 0이 아닌 플레이어들 간의 상호작용
+        int action = randint(1, 3); // 1: 강탈, 2: 회유, 3: 무시
+
+        switch (action) {
+        case 1:
+            perform_robbery(player_id, other_player_id);
+            break;
+        case 2:
+            perform_persuasion(player_id, other_player_id);
+            break;
+        case 3:
+            printf("Player %d와 Player %d는 상호작용을 하지 않습니다.\n", player_id, other_player_id);
+            break;
         }
-        break;
-    case 2: // 회유시도
-        if (player[player_id].intel > player[other_player_id].intel) {
-            // 성공 로직
-            printf("회유 성공!\n");
-            // 아이템 교환 로직(아이템이 있다면)
-            if (player[other_player_id].hasitem) {
-                ITEM temp = player[player_id].item;
-                player[player_id].item = player[other_player_id].item;
-                player[other_player_id].item = temp;
-                player[player_id].hasitem = true;
-                player[other_player_id].hasitem = false;
-            }
-            // 스태미나 조정 로직
-            player[player_id].stamina = max(0, player[player_id].stamina - 20);
-        }
-        else {
-            // 회유 실패 로직
-            printf("회유 실패...\n");
-            // 스태미나 조정 로직
-            player[player_id].stamina = max(0, player[player_id].stamina - 40);
-        }
-        break;
-    case 3: // 무시
-        printf("상호작용을 무시합니다.\n");
-        break;
-    default:
-        printf("잘못된 선택입니다.\n");
     }
 }
 
