@@ -178,19 +178,19 @@ void nightgame(void) {
 						if (i == 0) { // 플레이어 0
 							printf("교환하려면 Y를, 그렇지 않으면 N을 누르세요: ");
 
-
-
-							//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-							//!!!!!!!!!!! 여기를 교수님 sample 코드처럼 get key로 바꾸세요.
-							char decision = getchar();
-							if (decision == 'Y' || decision == 'y') {
+							key_t key = get_key();
+							if (key == K_ALL) {
 								exchange = true;
+	
 							}
-							else if (decision == 'N' || decision == 'n') {
-								//무시하는 코드 추가
+							else if (key == K_NONE) {
 								printf("Player %d ignored item at (%d, %d)\n", i, itmx[j], itmy[j]);
 								continue;
 							}
+
+							//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							//!!!!!!!!!!! 여기를 교수님 sample 코드처럼 get key로 바꾸세요.
+						
 						} else {
 							if (randint(0, 1)) {
 								exchange = true;
