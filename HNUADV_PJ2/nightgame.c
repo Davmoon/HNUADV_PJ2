@@ -1,4 +1,3 @@
-
 #include "jjuggumi.h"
 #include "canvas.h"
 #include "keyin.h"
@@ -33,7 +32,7 @@ void ng_init(void) {
 			back_buf[px[i]][py[i]] = '0' + i;  // (0 .. n_player-1)
 		}
 	}
-	
+
 	//item 랜덤 배치
 	for (int i = 0; i < n_player; i++) {
 		do {
@@ -173,14 +172,34 @@ void nightgame(void) {
 						back_buf[itmx[j]][itmy[j]] = ' '; // 아이템 위치를 공백으로 변경
 						itmx[j] = -1; // 아이템 위치를 유효하지 않은 값으로 설정
 						itmy[j] = -1;
-					}else {
+					}
+					else {
 						// 교환 로직 실행
-						printf("교환하려면 Y를, 그렇지 않으면 N을 누르세요: ");
-						key_t key = get_key();
-						if (key == K_QUIT) {
-							break;
+						bool exchange = false;
+						if (i == 0) { // 플레이어 0
+							printf("교환하려면 Y를, 그렇지 않으면 N을 누르세요: ");
+
+							char userInput;
+							scanf_s(" %c", &userInput); // 표준 입력 함수 사용
+
+							if (userInput == 'Y' || userInput == 'y') {
+								exchange = true;
+							}
+							else if (userInput == 'N' || userInput == 'n') {
+								printf("Player %d ignored item at (%d, %d)", i, itmx[j], itmy[j]);
+								continue;
+							}
 						}
-						else if (key == K_YES) {
+						//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+						//!!!!!!!!!!! 여기를 교수님 sample 코드처럼 get key로 바꾸세요.
+
+						else {
+							if (randint(0, 1)) {
+								exchange = true;
+							}
+
+						}
+						if (exchange) {
 							back_buf[curr_itmx[i]][curr_itmy[i]] = 'I'; // 이전 아이템 위치에 아이템 표시
 							// 새 아이템의 위치를 현재 아이템 위치로 업데이트
 							curr_itmx[i] = itmx[j];
@@ -190,16 +209,6 @@ void nightgame(void) {
 							itmx[j] = -1; // 아이템 위치를 유효하지 않은 값으로 설정
 							itmy[j] = -1;
 						}
-						else if (key == K_NO) {
-							printf("Player %d ignored item at (%d, %d)", i, itmx[j], itmy[j]);
-							continue;
-						}
-						else if (key != K_UNDEFINED) {
-
-							move_manual(key);
-
-						}
-
 					}
 				}
 			}
