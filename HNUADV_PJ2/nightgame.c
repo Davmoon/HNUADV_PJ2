@@ -3,219 +3,225 @@
 #include "keyin.h"
 #include <stdio.h>
 
-#define DIR_UP		0
-#define DIR_DOWN	1
-#define DIR_LEFT	2
-#define DIR_RIGHT	3
+#define DIR_UP      0
+#define DIR_DOWN   1
+#define DIR_LEFT   2
+#define DIR_RIGHT   3
 
 void ng_init();
-void ngmv_random(int, int);
+void ngmv_random(int);
 bool ngmv_manual(key_t);
 void nightgame();
 
-int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX], curr_itmx[PLAYER_MAX], curr_itmy[PLAYER_MAX];
+int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX];
 
 void ng_init(void) {
-	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
-	int x, y;
-	for (int i = 0; i < n_player; i++) {
-		// 같은 자리가 나오면 다시 생성
-		if (player[i].is_alive == true) {
-			do {
-				x = randint(1, N_ROW - 2);
-				y = randint(1, N_COL - 2);
-			} while (!placable(x, y));
-			px[i] = x;
-			py[i] = y;
-			period[i] = randint(100, 500);
+    map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
 
-			back_buf[px[i]][py[i]] = '0' + i;  // (0 .. n_player-1)
-		}
-	}
+    int x, y;
+    for (int i = 0; i < n_player; i++) {
+        // 같은 자리가 나오면 다시 생성
+        if (player[i].is_alive == true) {
+            do {
+                x = randint(1, N_ROW - 2);
+                y = randint(1, N_COL - 2);
+            } while (!placable(x, y));
+            px[i] = x;
+            py[i] = y;
+            period[i] = randint(100, 500);
 
-	//item 랜덤 배치
-	for (int i = 0; i < n_player; i++) {
-		do {
-			x = randint(1, N_ROW - 2);
-			y = randint(1, N_COL - 2);
-		} while (!placable(x, y));
-		itmx[i] = x;
-		itmy[i] = y;
+            back_buf[px[i]][py[i]] = '0' + i;  // (0 .. n_player-1)
+        }
+    }
 
-		back_buf[itmx[i]][itmy[i]] = 'I';  // 아이템은 항상 i로 표기
-	}
-	for (int i = 0; i < n_player; i++) {
-		curr_itmx[i] = -1;
-		curr_itmy[i] = -1;
-	}
+    //item 랜덤 배치
+    for (int i = 0; i < n_player - 1; i++) {
+        do {
+            x = randint(1, N_ROW - 2);
+            y = randint(1, N_COL - 2);
+        } while (!placable(x, y));
+        itmx[i] = x;
+        itmy[i] = y;
 
-	tick = 0;
+        back_buf[itmx[i]][itmy[i]] = 'I';  // 아이템은 항상 i로 표기
+    }
+
+    tick = 0;
 }
 
 
 bool ngmv_manual(key_t key) {
-	// 각 방향으로 움직일 때 x, y값 delta
-	static int dx[4] = { -1, 1, 0, 0 };
-	static int dy[4] = { 0, 0, -1, 1 };
+    // 각 방향으로 움직일 때 x, y값 delta
+    static int dx[4] = { -1, 1, 0, 0 };
+    static int dy[4] = { 0, 0, -1, 1 };
 
-	int dir;  // 움직일 방향(0~3)
-	switch (key) {
-	case K_UP: dir = DIR_UP; break;
-	case K_DOWN: dir = DIR_DOWN; break;
-	case K_LEFT: dir = DIR_LEFT; break;
-	case K_RIGHT: dir = DIR_RIGHT; break;
-	default: return;
-	}
+    int dir;  // 움직일 방향(0~3)
+    switch (key) {
+    case K_UP: dir = DIR_UP; break;
+    case K_DOWN: dir = DIR_DOWN; break;
+    case K_LEFT: dir = DIR_LEFT; break;
+    case K_RIGHT: dir = DIR_RIGHT; break;
+    default: return;
+    }
 
-	// 움직여서 놓일 자리
-	int nx, ny;
-	nx = px[0] + dx[dir];
-	ny = py[0] + dy[dir];
-	if (!placable(nx, ny)) {
-		return false;
-	}
+    // 움직여서 놓일 자리
+    int nx, ny;
+    nx = px[0] + dx[dir];
+    ny = py[0] + dy[dir];
+    if (!placable(nx, ny)) {
+        return false;
+    }
 
-	move_tail(0, nx, ny);
-	return true;
+    move_tail(0, nx, ny);
+    return true;
 }
 
 // 가장 가까운 목표 찾기
 void find_nearest_target(int p, int* target_x, int* target_y) {
-	int min_dist = INT_MAX;
-	int dist, tx, ty;
+    int min_dist = INT_MAX;
+    int dist, tx, ty;
 
-	// 아이템 위치 확인
-	for (int i = 0; i < n_item; i++) {
-		tx = itmx[i];
-		ty = itmy[i];
-		dist = abs(px[p] - tx) + abs(py[p] - ty);
+    // 아이템 위치 확인
+    for (int i = 0; i < n_item; i++) {
+        tx = itmx[i];
+        ty = itmy[i];
+        dist = abs(px[p] - tx) + abs(py[p] - ty);
 
-		if (dist < min_dist) {
-			min_dist = dist;
-			*target_x = tx;
-			*target_y = ty;
-		}
-	}
+        if (dist < min_dist) {
+            min_dist = dist;
+            *target_x = tx;
+            *target_y = ty;
+        }
+    }
 
-	// 다른 플레이어가 가진 아이템 위치 확인
-	for (int i = 0; i < n_player; i++) {
-		if (i != p && player[i].hasitem) {
-			tx = px[i];
-			ty = py[i];
-			dist = abs(px[p] - tx) + abs(py[p] - ty);
+    // 다른 플레이어가 가진 아이템 위치 확인
+    for (int i = 0; i < n_player; i++) {
+        if (i != p && player[i].hasitem) {
+            tx = px[i];
+            ty = py[i];
+            dist = abs(px[p] - tx) + abs(py[p] - ty);
 
-			if (dist < min_dist) {
-				min_dist = dist;
-				*target_x = tx;
-				*target_y = ty;
-			}
-		}
-	}
+            if (dist < min_dist) {
+                min_dist = dist;
+                *target_x = tx;
+                *target_y = ty;
+            }
+        }
+    }
 }
 
 
 //이동 주기 및 로직 업데이트
-void ngmv_random(int p, int chance) {
-	if (chance == -1) {
-		int target_x, target_y;
-		find_nearest_target(p, &target_x, &target_y);
+void ngmv_random(int p) {
+    int target_x, target_y;
+    find_nearest_target(p, &target_x, &target_y);
 
-		// 가장 가까운 목표를 향해 이동
-		int nx = px[p], ny = py[p];
-		if (px[p] < target_x) nx++;
-		else if (px[p] > target_x) nx--;
+    // 가장 가까운 목표를 향해 이동
+    int nx = px[p], ny = py[p];
+    if (px[p] < target_x) nx++;
+    else if (px[p] > target_x) nx--;
 
-		if (py[p] < target_y) ny++;
-		else if (py[p] > target_y) ny--;
+    if (py[p] < target_y) ny++;
+    else if (py[p] > target_y) ny--;
 
-		// 이동 가능 여부 확인
-		if (placable(nx, ny)) {
-			move_tail(p, nx, ny);
-		}
-	}
+    // 이동 가능 여부 확인
+    if (placable(nx, ny)) {
+        move_tail(p, nx, ny);
+    }
 }
 
+//아이템 획득 로직
+void pickup_item(int player_id) {
+    for (int i = 0; i < n_item; i++) {
+        if (px[player_id] == itmx[i] && py[player_id] == itmy[i] && !player[player_id].hasitem) {
+            player[player_id].item = item[i];
+            player[player_id].hasitem = true;
+
+            // 아이템을 맵에서 제거
+            back_buf[itmx[i]][itmy[i]] = '0' + player_id; // 플레이어의 번호로 다시 표시
+            itmx[i] = -1;
+            itmy[i] = -1;
+
+            // 아이템 획득 다이얼로그 표시
+            char message[100];
+            sprintf_s(message, sizeof(message), "Player %d 획득했습니다. %s", player_id, item[i].name);
+            dialog(message);
+            break;
+        }
+    }
+}
+
+//아이템 교환 로직
+void exchange_item(int player_id) {
+    for (int i = 0; i < n_item; i++) {
+        // 플레이어와 아이템이 같은 위치에 있는지 확인
+        if (px[player_id] == itmx[i] && py[player_id] == itmy[i]) {
+            bool exchange = false;
+
+            // 플레이어 0이면 키보드 입력으로 결정
+            if (player_id == 0) {
+                printf("아이템을 교환하시겠습니까? (y/n): ");
+                char choice = getchar();
+                exchange = (choice == 'y' || choice == 'Y');
+                getchar();
+            }
+            else {
+                // 다른 플레이어는 50% 확률로 결정
+                exchange = (randint(0, 1) == 1);
+            }
+
+            if (exchange) {
+                // 아이템 교환
+                ITEM temp = player[player_id].item;
+                player[player_id].item = item[i];
+                item[i] = temp;
+
+                // 교환 다이얼로그 표시
+                char message[100];
+                sprintf_s(message, sizeof(message), "Player %d교환 %s with %s", player_id, temp.name, player[player_id].item.name);
+                dialog(message);
+            }
+            break;
+        }
+    }
+}
+
+
 void nightgame(void) {
-	sample_init();
-	system("cls");
-	ng_init();
-	display();
-	while (1) {
-		// player 0만 손으로 움직임(4방향)
-		key_t key = get_key();
-		if (key == K_QUIT) {
-			break;
-		}
-		else if (key != K_UNDEFINED) {
+    system("cls");
+    ng_init();
+    display();
+    while (1) {
+        // player 0만 손으로 움직임(4방향)
+        key_t key = get_key();
+        if (key == K_QUIT) {
+            break;
+        }
+        else if (key != K_UNDEFINED) {
 
-			move_manual(key);
+            move_manual(key);
 
-		}
+        }
+        // player 1의 움직임
+        for (int i = 1; i < n_player; i++) {
+            if (tick % period[i] == 0) {
+                ngmv_random(i, -1);
+            }
+        }
+        // 아이템 상호작용 로직
+        for (int i = 0; i < n_player; i++) {
+            if (player[i].is_alive) {
+                if (player[i].hasitem) {
+                    exchange_item(i);
+                }
+                else {
+                    pickup_item(i);
+                }
+            }
+        }
 
-		// player 1의 움직임
-		for (int i = 1; i < n_player; i++) {
-			if (tick % period[i] == 0) {
-				ngmv_random(i, -1);
-			}
-		}
-		for (int i = 0; i < n_player; i++) {
-			for (int j = 0; j < n_item; j++) {
-				// 플레이어가 아이템과 인접한지 확인
-				if (abs(px[i] - itmx[j]) + abs(py[i] - itmy[j]) == 1 && itmx[j] != -1) {
-					if (!player[i].hasitem) {
-						player[i].hasitem = true;
-						curr_itmx[i] = itmx[j];
-						curr_itmy[i] = itmy[j];
-						// 아이템 획득
-						printf("Player %d acquired item at (%d, %d)\n", i, itmx[j], itmy[j]);
-						// 아이템을 맵에서 제거
-						back_buf[itmx[j]][itmy[j]] = ' '; // 아이템 위치를 공백으로 변경
-						itmx[j] = -1; // 아이템 위치를 유효하지 않은 값으로 설정
-						itmy[j] = -1;
-					}
-					else {
-						// 교환 로직 실행
-						bool exchange = false;
-						if (i == 0) { // 플레이어 0
-							printf("교환하려면 Y를, 그렇지 않으면 N을 누르세요: ");
-
-							char userInput;
-							scanf_s(" %c", &userInput); // 표준 입력 함수 사용
-
-							if (userInput == 'Y' || userInput == 'y') {
-								exchange = true;
-							}
-							else if (userInput == 'N' || userInput == 'n') {
-								printf("Player %d ignored item at (%d, %d)", i, itmx[j], itmy[j]);
-								continue;
-							}
-						}
-						//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-						//!!!!!!!!!!! 여기를 교수님 sample 코드처럼 get key로 바꾸세요.
-
-						else {
-							if (randint(0, 1)) {
-								exchange = true;
-							}
-
-						}
-						if (exchange) {
-							back_buf[curr_itmx[i]][curr_itmy[i]] = 'I'; // 이전 아이템 위치에 아이템 표시
-							// 새 아이템의 위치를 현재 아이템 위치로 업데이트
-							curr_itmx[i] = itmx[j];
-							curr_itmy[i] = itmy[j];
-							printf("Player %d exchanged item at (%d, %d)\n", i, itmx[j], itmy[j]);
-							back_buf[itmx[j]][itmy[j]] = ' '; // 아이템 위치를 공백으로 변경
-							itmx[j] = -1; // 아이템 위치를 유효하지 않은 값으로 설정
-							itmy[j] = -1;
-						}
-					}
-				}
-			}
-		}
-
-		display();
-		Sleep(10);
-		tick += 10;
-	}
+        display();
+        Sleep(10);
+        tick += 10;
+    }
 }

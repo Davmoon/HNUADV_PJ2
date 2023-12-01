@@ -45,11 +45,12 @@ void map_init(int n_row, int n_col) {
 bool placable(int row, int col) {
 	if (row < 0 || row >= N_ROW ||
 		col < 0 || col >= N_COL ||
-		back_buf[row][col] != ' ') {
+		(back_buf[row][col] != ' ' && back_buf[row][col] != 'I')) {
 		return false;
 	}
 	return true;
 }
+
 
 // 상단에 맵을, 하단에는 현재 상태를 출력
 void display(void) {
