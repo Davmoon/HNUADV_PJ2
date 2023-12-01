@@ -188,12 +188,6 @@ void exchange_item(int player_id) {
                 itmy[i] = new_item_y;
                 back_buf[new_item_x][new_item_y] = 'I';
 
-                // 플레이어 위치 업데이트
-                back_buf[py[player_id]][px[player_id]] = '0' + player_id;
-
-                // 교환 여부 표시
-                player[player_id].exchanged = true;
-
                 // 교환 다이얼로그 표시
                 char message[100];
                 sprintf_s(message, sizeof(message), "Player %d: %s 를 %s로 교환했습니다.", player_id, temp.name, player[player_id].item.name);
