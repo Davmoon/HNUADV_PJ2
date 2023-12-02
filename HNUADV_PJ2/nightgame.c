@@ -143,8 +143,8 @@ void pickup_item(int player_id) {
             itmy[i] = -1;
 
             // 아이템 획득 다이얼로그 표시
-            char message[100];
-            sprintf_s(message, sizeof(message), "Player %d: %s를 획득했습니다.", player_id, item[i].name);
+            char message[30];
+            sprintf_s(message, sizeof(message), "%d번: %s 획득", player_id, item[i].name);
             dialog(message);
             break;
         }
@@ -161,6 +161,7 @@ void exchange_item(int player_id) {
             bool ignore = false;
             // 플레이어 0이면 키보드 입력으로 결정
             if (player_id == 0) {
+                
                 printf("아이템을 교환하시겠습니까? (y/n): ");
                 char choice = getchar();
 
@@ -210,8 +211,8 @@ void exchange_item(int player_id) {
                 back_buf[new_item_x][new_item_y] = 'I';
 
                 // 교환 다이얼로그 표시
-                char message[100];
-                sprintf_s(message, sizeof(message), "Player %d: %s 를 %s로 교환했습니다.", player_id, temp.name, player[player_id].item.name);
+                char message[30];
+                sprintf_s(message, sizeof(message), "%d번: %s -> %s 교환", player_id, temp.name, player[player_id].item.name);
                 dialog(message);
             }
 
@@ -226,8 +227,8 @@ void exchange_item(int player_id) {
                 itmy[i] = new_item_y;
                 back_buf[new_item_x][new_item_y] = 'I';
 
-                char message[100];
-                sprintf_s(message, sizeof(message), "Player %d: %s를 무시했습니다.", player_id, player[player_id].item.name);
+                char message[30];
+                sprintf_s(message, sizeof(message), "%d번: %s를 무시", player_id, player[player_id].item.name);
                 dialog(message);
                 printf("%s은 랜덤한 위치에 다시 배치됐습니다.\n", player[player_id].item.name);
             }
@@ -242,15 +243,19 @@ void reset_interactions() {
 }
 
 void handle_interaction(int player_id, int other_player_id) {
-
-    printf("Player %d이 Player %d와 상호작용 합니다.\n", player_id, other_player_id);
+    
+    printf("%d번이 %d번과 상호작용 .\n", player_id, other_player_id);
     int choice;
 
     if (player_id == 0) {
         // 상호작용 선택지 제공
+      
         printf("1) 강탈시도\n");
+       
         printf("2) 회유시도\n");
+       ;
         printf("3) 무시\n");
+        
         printf("선택: ");
         scanf_s("%d", &choice);
         getchar(); // 입력 버퍼 비우기
@@ -263,6 +268,7 @@ void handle_interaction(int player_id, int other_player_id) {
     case 1: // 강탈시도
         if (player[player_id].str > player[other_player_id].str) {
             // 성공 로직
+          
             printf("강탈 성공!\n");
             // 아이템 교환 로직
             if (player[other_player_id].hasitem) {
@@ -277,6 +283,7 @@ void handle_interaction(int player_id, int other_player_id) {
         }
         else {
             // 실패 로직
+           
             printf("강탈 실패...\n");
             // 스태미나 조정 로직
             player[player_id].stamina = max(0, player[player_id].stamina - 60);
@@ -285,6 +292,7 @@ void handle_interaction(int player_id, int other_player_id) {
     case 2: // 회유시도
         if (player[player_id].intel > player[other_player_id].intel) {
             // 성공 로직
+           
             printf("회유 성공!\n");
             // 아이템 교환 로직(아이템이 있다면)
             if (player[other_player_id].hasitem) {
@@ -299,15 +307,18 @@ void handle_interaction(int player_id, int other_player_id) {
         }
         else {
             // 회유 실패 로직
+            
             printf("회유 실패...\n");
             // 스태미나 조정 로직
             player[player_id].stamina = max(0, player[player_id].stamina - 40);
         }
         break;
     case 3: // 무시
+       
         printf("상호작용을 무시합니다.\n");
         break;
     default:
+        
         printf("잘못된 선택입니다.\n");
     }
 }
