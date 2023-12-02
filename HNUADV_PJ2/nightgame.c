@@ -153,22 +153,42 @@ void pickup_item(int player_id) {
 
 //아이템 교환 로직
 void exchange_item(int player_id) {
+   
     for (int i = 0; i < n_item; i++) {
         // 플레이어와 아이템이 같은 위치에 있는지 확인
         if (px[player_id] == itmx[i] && py[player_id] == itmy[i] && player[player_id].hasitem) {
             bool exchange = false;
-
+            bool ignore = false;
             // 플레이어 0이면 키보드 입력으로 결정
             if (player_id == 0) {
                 printf("아이템을 교환하시겠습니까? (y/n): ");
                 char choice = getchar();
-                exchange = (choice == 'y' || choice == 'Y');
+
+                if (choice == 'n' || choice == 'N') {
+                    ignore = (choice == 'n' || choice == "N");
+                }
+                  
+                else {
+                    exchange = (choice == 'y' || choice == 'Y');
+                }
+
                 getchar();
             }
+            
 
             else {
                 // 다른 플레이어는 50% 확률로 결정
-                exchange = (randint(0, 1) == 1);
+                double random_value = (double)randint(0, RAND_MAX) / RAND_MAX;
+
+                if (random_value < 0.5) {
+                    // 50% 확률로 ignore 선택
+                    ignore = true;
+                }
+                else {
+                    // 나머지 50% 확률로 exchange 선택
+                    exchange = true;
+                }
+                
             }
 
             if (exchange) {
@@ -184,7 +204,7 @@ void exchange_item(int player_id) {
                 player[player_id].item = item[i];
                 item[i] = temp;
 
-                // 기존 아이템 위치에 새 아이템 배치
+   
                 itmx[i] = new_item_x;
                 itmy[i] = new_item_y;
                 back_buf[new_item_x][new_item_y] = 'I';
@@ -193,6 +213,23 @@ void exchange_item(int player_id) {
                 char message[100];
                 sprintf_s(message, sizeof(message), "Player %d: %s 를 %s로 교환했습니다.", player_id, temp.name, player[player_id].item.name);
                 dialog(message);
+            }
+
+            if (ignore) {
+                int new_item_x, new_item_y;
+                do {
+                    new_item_x = randint(1, N_ROW - 2);
+                    new_item_y = randint(1, N_COL - 2);
+                } while (!placable(new_item_x, new_item_y));
+
+                itmx[i] = new_item_x;
+                itmy[i] = new_item_y;
+                back_buf[new_item_x][new_item_y] = 'I';
+
+                char message[100];
+                sprintf_s(message, sizeof(message), "Player %d: %s를 무시했습니다.", player_id, player[player_id].item.name);
+                dialog(message);
+                printf("%s은 랜덤한 위치에 다시 배치됐습니다.\n", player[player_id].item.name);
             }
             break;
         }
