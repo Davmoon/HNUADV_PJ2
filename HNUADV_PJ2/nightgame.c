@@ -18,7 +18,8 @@ int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[P
 
 void ng_init(void) {
 	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
-	int period_set[] = { 250, 260, 270, 280, 290, 300, 310, 320, 330, 340 };
+	int period_set[] = { 300,300,300,300,300,300,300,300,300,300 };
+	//int period_set[] = { 250, 260, 270, 280, 290, 300, 310, 320, 330, 340 };
 
 	int x, y;
 	for (int i = 0; i < n_player; i++) {
@@ -98,7 +99,7 @@ bool ck_near_itm(int pnum, int* itm_or_player_num) {
 	}
 
 	for (int i = 0; i < n_player; i++) {
-		if (i != player[i].hasitem && i != pnum && player[i].is_alive == true ) {
+		if (i == player[i].hasitem && i != pnum && player[i].is_alive == true ) {
 			// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
 			int dx = abs(px[i] - px[pnum]); int dy = abs(py[i] - py[pnum]);
 
@@ -136,9 +137,7 @@ void nightgame(void) {
 			break;
 		}
 		else if (key != K_UNDEFINED) {
-
 			move_manual(key);
-
 		}
 
 		//0을 제외한 플레이어 아이템(혹은 아이템 가진 플레이어)로 이동하는 코드
@@ -147,6 +146,8 @@ void nightgame(void) {
 				ngmv_random(i);
 			}
 		}
+
+
 		
 		display();
 		Sleep(10);
