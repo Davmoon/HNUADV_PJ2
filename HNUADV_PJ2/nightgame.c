@@ -10,7 +10,7 @@
 #define DIR_RIGHT	3
 
 void ng_init();
-void ngmv_random(int, int);
+void ngmv_random(int);
 void nightgame();
 void ck_near_item();
 
@@ -51,7 +51,7 @@ void ng_init(void) {
 }
 
 // 0 <= dir < 4가 아니면 랜덤
-void ngmv_random(int player, int dir) {
+void ngmv_random(int player) {
 	int p = player;  // 이름이 길어서...
 	int nx, ny;  // 움직여서 다음에 놓일 자리
 
@@ -110,7 +110,11 @@ void nightgame(void) {
 
 		}
 
-		// player 1 부터는 랜덤으로 움직임(8방향)
+		for (int i = 1; i < n_player; i++) {
+			if (player[i].is_alive == true && tick % period[i] == 0) {
+				ngmv_random(i);
+			}
+		}
 		
 
 		display();
