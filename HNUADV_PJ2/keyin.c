@@ -11,7 +11,9 @@ bool is_valid(key_t key) {
 		K_LEFT,
 		K_RIGHT,
 		K_SPACE,
-		K_QUIT,
+		K_YES,
+		K_NO,
+		K_QUIT
 	};
 
 	for (int i = 0; i < N_KEY; i++) { // UNDEFINED 포함 6개 키

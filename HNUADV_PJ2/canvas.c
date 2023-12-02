@@ -45,7 +45,7 @@ void map_init(int n_row, int n_col) {
 bool placable(int row, int col) {
 	if (row < 0 || row >= N_ROW ||
 		col < 0 || col >= N_COL ||
-		back_buf[row][col] != ' ') {
+		back_buf[row][col] != ' ' || back_buf[row][col] != 'I') {
 		return false;
 	}
 	return true;
@@ -78,15 +78,15 @@ void print_status(void) {
 	printf("\t\t\tintl\tstr\tstm\n");
 
 	for (int p = 0; p < n_player; p++) {
-		printf("player %2d: %5s\t%d(+%d)\t%d(+%d)\t%d%%\n",
+		printf("player %02d: %5s\t%02d(%d)\t%02d(%d)\t%03d(%d)%%\n",
 			p,
 			player[p].is_alive ? "alive" : "DEAD",
 			player[p].intel,
 			player[p].item.intel_buf,
 			player[p].str,
 			player[p].item.str_buf,
-			player[p].stamina
-			//player[p].item.stamina_buf
+			player[p].stamina,
+			player[p].item.stamina_buf
 			);
 	}
 }

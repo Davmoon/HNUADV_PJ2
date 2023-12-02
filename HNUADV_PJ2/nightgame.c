@@ -12,6 +12,7 @@
 void ng_init();
 void ngmv_random(int);
 void nightgame();
+void cg_item(int, int);
 bool ck_near_itm(int, int*);
 
 int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX];
@@ -58,9 +59,9 @@ void ngmv_random(int p) {
 	int itm_or_player_num;
 	int nx = px[p], ny = py[p];  // 움직여서 다음에 놓일 자리
 	int target_x, target_y;
-	bool check = ck_near_itm(p, &itm_or_player_num);
+	
 
-	if (check) {
+	if (ck_near_itm(p, &itm_or_player_num)) {
 		//item index인 경우
 		target_x = itmx[itm_or_player_num]; target_y = itmy[itm_or_player_num];
 	}
@@ -78,16 +79,57 @@ void ngmv_random(int p) {
 	if (placable(nx, ny)) {
 		move_tail(p, nx, ny);
 	}
-	else if (nx == target_x && ny == target_y) {
-		if (check) {
-			move_tail(p, nx, ny);
-			itm_take[itm_or_player_num] = false;
-			player[p].hasitem = true;
-			player[p].item = item[itm_or_player_num]; // 포인터 주소값으로 연결해줌.
 
+}
+
+void itraction() {
+		else if (nx == target_x && ny == target_y) {
+			//아이템에 접근하는 경우
+			if (check) {
+				if (player[p].hasitem == false) {
+					move_tail(p, nx, ny);
+					itm_take[itm_or_player_num] = false;
+					player[p].hasitem = true;
+					player[p].item = item[itm_or_player_num]; // 포인터 주소값으로 연결해줌.
+				}
+				else {
+					cg_item(p, itm_or_player_num);
+				}
+
+			}
+			// 아이템 가진 플레이어에 접근하는 경우
+			else {
+
+			}
+			}
+}
+
+void cg_item(int p, int itmnum) {
+	int choose = randint(0, 1);
+	
+	if (p == 0) {
+		gotoxy(N_ROW, 0);
+		printf("아이템을 교환하시겠습니까? y/n");
+		while (1) {
+			key_t key = get_key();
+			if (key == K_YES) {
+				player[p].item = item[itmnum];
+				dialog("0번 아이템 교체됨");
+				break;
+			}
+			if (key == K_NO) {
+				break;
+			}
 		}
+	}
+	else {
+		if (choose == 0) {}
 		else {
+			player[p].item = item[itmnum];
+			char msgp[100];
 
+			sprintf_s(msgp, sizeof(msgp), "player %d 아이템 교체", p);
+			dialog(msgp);
 		}
 	}
 }
@@ -145,6 +187,7 @@ void nightgame(void) {
 			}
 		}
 
+		// 모든 플레이어 감시
 		for (int i = 0; i < n_player; i++) {
 			if (player[i].is_alive) {
 				if (player[i].hasitem) {
