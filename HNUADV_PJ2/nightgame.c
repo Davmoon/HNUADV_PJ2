@@ -12,12 +12,13 @@
 void ng_init();
 void ngmv_random(int);
 void nightgame();
-void ck_near_itm(int);
+bool ck_near_itm(int, int*);
 
 int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX];
 
 void ng_init(void) {
 	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
+	int period_set[] = { 250, 260, 270, 280, 290, 300, 310, 320, 330, 340 };
 
 	int x, y;
 	for (int i = 0; i < n_player; i++) {
@@ -29,14 +30,14 @@ void ng_init(void) {
 			} while (!placable(x, y));
 			px[i] = x;
 			py[i] = y;
-			period[i] = randint(100, 500);
+			period[i] = period_set[i];
 
 			back_buf[px[i]][py[i]] = '0' + i;  // (0 .. n_player-1)
 		}
 	}
 
-	//item 랜덤 배치
-	for (int i = 0; i < n_alive - 1; i++) {
+	//item 랜덤 배치 추후 item 종류도 랜덤화 추가
+	for (int i = 0; i < n_alive; i++) {
 		do {
 			x = randint(1, N_ROW - 2);
 			y = randint(1, N_COL - 2);
@@ -53,26 +54,37 @@ void ng_init(void) {
 // 0 <= dir < 4가 아니면 랜덤
 void ngmv_random(int pnum) {
 	int itm_or_player_num;
-	ck_near_itm(pnum);
+	int nx = px[pnum], ny = py[pnum];  // 움직여서 다음에 놓일 자리
+	int target_x, target_y;
 
+	if (ck_near_itm(pnum, &itm_or_player_num)) {
+		//item index인 경우
+		target_x = itmx[itm_or_player_num]; target_y = itmy[itm_or_player_num];
+	}
+	else {
+		// 플레이어 index인 경우
+		target_x = px[itm_or_player_num]; target_y = py[itm_or_player_num];
+	}
 
-	int nx, ny;  // 움직여서 다음에 놓일 자리
+	// 여기 코드에 문제가 있는듯. 아직 아이템 먹었을 때 처리 안해서 그런듯.
+	if (px[pnum] < target_x) nx++;
+	else if (px[pnum] > target_x) nx--;
 
-	do {
-		nx = randint(-1, 1);
-		ny = randint(-1, 1);
-	} while (!placable(nx, ny));
+	if (py[pnum] < target_y) ny++;
+	else if (py[pnum] > target_y) ny--;
 
-	move_tail(player, nx, ny);
+	if (placable(nx, ny)) {
+		move_tail(pnum, nx, ny);
+	}
 }
 
-void ck_near_itm(int pnum) {
+bool ck_near_itm(int pnum, int* itm_or_player_num) {
 	double len = 0.;
 	bool itmT_or_playerF = true;
-	int itm_num = 0, player_itm_num = 0;
+	int short_index = 0;
 
 	for (int i = 0; i < n_item; i++) {
-		// 아이템과 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs()사용
+		// 아이템과 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
 		int dx = abs(itmx[i] - px[pnum]); int dy = abs(itmy[i] - py[pnum]);
 
 		int x = dx * dx; int y = dy * dy;
@@ -81,29 +93,31 @@ void ck_near_itm(int pnum) {
 		//len이 작은 것을 찾는 것이기 때문에 0이 들어가면 계속 0이기 때문.
 		if (i == 0) { len = lena; continue; }
 
-		// 길이가 짧으면 lena로 교체, 그리고 itm 번호를 
-		if (lena < len) { len = lena; itm_num = i; }
+		// 길이가 짧으면 lena로 교체, 그리고 itm 번호를 저장
+		if (lena < len) { len = lena; short_index = i; }
 	}
 
 	for (int i = 0; i < n_player; i++) {
 		if (i != player[i].hasitem && i != pnum && player[i].is_alive == true ) {
-			// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs()사용
+			// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
 			int dx = abs(px[i] - px[pnum]); int dy = abs(py[i] - py[pnum]);
 
 			int x = dx * dx; int y = dy * dy;
 			double lena = sqrt(x + y);
 
-			//len이 작은 것을 찾는 것이기 때문에 0이 들어가면 계속 0이기 때문.
-			if (i == 0) { len = lena; continue; }
-
-			// 길이가 짧으면 lena로 교체, 그리고 itm 번호를 
-			if (lena < len) { len = lena; player_itm_num = i; itmT_or_playerF = false; }
+			// 길이가 짧으면 lena로 교체, 그리고 player 번호를 저장
+			if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
 		}
 	}
 
+	*itm_or_player_num = short_index;
+
 	// itm이 
 	if (itmT_or_playerF == true) {
-
+		return true;
+	}
+	else {
+		return false;
 	}
 
 
