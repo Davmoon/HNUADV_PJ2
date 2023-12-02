@@ -119,13 +119,39 @@ void cg_item(int p, int itmnum) {
 		while (1) {
 			key_t key = get_key();
 			if (key == K_YES) {
+				int nx, ny;
+				do {
+					nx = randint(1, N_ROW - 2);
+					ny = randint(1, N_COL - 2);
+					
+				} while (!placeable(nx, ny));
+
 				ITEM temp = player[p].item;
 				player[p].item = item[itmnum];
 				item[itmnum] = temp;
 				dialog("0번 아이템 교체됨");
+
+				itmx[itmnum] = nx; itmy[itmnum] = ny;
+				back_buf[nx][ny] = 'I';
+
 				break;
 			}
 			if (key == K_NO) {
+				int nx, ny;
+				do {
+					nx = randint(1, N_ROW - 2);
+					ny = randint(1, N_COL - 2);
+
+				} while (!placeable(nx, ny));
+
+				itmx[itmnum] = nx; itmy[itmnum] = ny;
+				back_buf[nx][ny] = 'I';
+
+				gotoxy(N_ROW, 0);
+				char msgp[30];
+				sprintf_s(msgp, sizeof(msgp), "player %d 아이템 무시", p);
+				printf("%s", msgp);
+				
 				break;
 			}
 		}
