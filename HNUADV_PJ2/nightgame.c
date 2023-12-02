@@ -12,7 +12,7 @@
 void ng_init();
 void ngmv_random(int);
 void nightgame();
-void ck_near_item();
+void ck_near_itm(int);
 
 int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX];
 
@@ -51,42 +51,59 @@ void ng_init(void) {
 }
 
 // 0 <= dir < 4가 아니면 랜덤
-void ngmv_random(int player) {
-	int p = player;  // 이름이 길어서...
+void ngmv_random(int pnum) {
+	int itm_or_player_num;
+	ck_near_itm(pnum);
+
+
 	int nx, ny;  // 움직여서 다음에 놓일 자리
 
-	// 움직일 공간이 없는 경우는 없다고 가정(무한 루프에 빠짐)	
-
 	do {
-		nx = px[p] + randint(-1, 1);
-		ny = py[p] + randint(-1, 1);
+		nx = randint(-1, 1);
+		ny = randint(-1, 1);
 	} while (!placable(nx, ny));
 
-	move_tail(p, nx, ny);
+	move_tail(player, nx, ny);
 }
 
-void ck_near_item() {
-	double len = 0;
+void ck_near_itm(int pnum) {
+	double len = 0.;
+	bool itmT_or_playerF = true;
+	int itm_num = 0, player_itm_num = 0;
 
-	for (int k= 1; k< n_player; k++) {
-		if (player[k].is_alive == true) {
+	for (int i = 0; i < n_item; i++) {
+		// 아이템과 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs()사용
+		int dx = abs(itmx[i] - px[pnum]); int dy = abs(itmy[i] - py[pnum]);
 
-			//가장 긴 길이 체크
-			for (int i = 0; i < n_alive - 2; i++) {
-				for (int j = 1; j < n_alive - 1; j++) {
-					int dx = itmx[i]; int dy = itmy[i];
-					int xx = px[i]; int yy = py[i];
+		int x = dx * dx; int y = dy * dy;
+		double lena = sqrt(x + y);
 
-					int x = (dx - xx) * (dx - xx);
-					int y = (dy - yy) * (dy - yy);
-					double lena = sqrt(x + y);
+		//len이 작은 것을 찾는 것이기 때문에 0이 들어가면 계속 0이기 때문.
+		if (i == 0) { len = lena; continue; }
 
-					if (lena > len) {
-						len = lena;
-					}
-				}
-			}
+		// 길이가 짧으면 lena로 교체, 그리고 itm 번호를 
+		if (lena < len) { len = lena; itm_num = i; }
+	}
+
+	for (int i = 0; i < n_player; i++) {
+		if (i != player[i].hasitem && i != pnum && player[i].is_alive == true ) {
+			// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs()사용
+			int dx = abs(px[i] - px[pnum]); int dy = abs(py[i] - py[pnum]);
+
+			int x = dx * dx; int y = dy * dy;
+			double lena = sqrt(x + y);
+
+			//len이 작은 것을 찾는 것이기 때문에 0이 들어가면 계속 0이기 때문.
+			if (i == 0) { len = lena; continue; }
+
+			// 길이가 짧으면 lena로 교체, 그리고 itm 번호를 
+			if (lena < len) { len = lena; player_itm_num = i; itmT_or_playerF = false; }
 		}
+	}
+
+	// itm이 
+	if (itmT_or_playerF == true) {
+
 	}
 
 
@@ -110,13 +127,13 @@ void nightgame(void) {
 
 		}
 
+		//0을 제외한 플레이어 아이템(혹은 아이템 가진 플레이어)로 이동하는 코드
 		for (int i = 1; i < n_player; i++) {
 			if (player[i].is_alive == true && tick % period[i] == 0) {
 				ngmv_random(i);
 			}
 		}
 		
-
 		display();
 		Sleep(10);
 		tick += 10;
