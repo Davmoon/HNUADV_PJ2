@@ -38,13 +38,14 @@ void ng_init(void) {
 	}
 
 	//item 랜덤 배치 추후 item 종류도 랜덤화 추가
-	for (int i = 0; i < n_alive; i++) {
+	for (int i = 0; i < n_alive - 1; i++) {
 		do {
 			x = randint(1, N_ROW - 2);
 			y = randint(1, N_COL - 2);
 		} while (!placable(x, y));
 		itmx[i] = x;
 		itmy[i] = y;
+		itm_take[i] = true;
 
 		back_buf[itmx[i]][itmy[i]] = 'I';  // 아이템은 항상 i로 표기
 	}
@@ -53,12 +54,13 @@ void ng_init(void) {
 }
 
 // 0 <= dir < 4가 아니면 랜덤
-void ngmv_random(int pnum) {
+void ngmv_random(int p) {
 	int itm_or_player_num;
-	int nx = px[pnum], ny = py[pnum];  // 움직여서 다음에 놓일 자리
+	int nx = px[p], ny = py[p];  // 움직여서 다음에 놓일 자리
 	int target_x, target_y;
+	bool check = ck_near_itm(p, &itm_or_player_num);
 
-	if (ck_near_itm(pnum, &itm_or_player_num)) {
+	if (check) {
 		//item index인 경우
 		target_x = itmx[itm_or_player_num]; target_y = itmy[itm_or_player_num];
 	}
@@ -67,44 +69,48 @@ void ngmv_random(int pnum) {
 		target_x = px[itm_or_player_num]; target_y = py[itm_or_player_num];
 	}
 
-	// 여기 코드에 문제가 있는듯. 아직 아이템 먹었을 때 처리 안해서 그런듯.
-	if (px[pnum] < target_x) nx++;
-	else if (px[pnum] > target_x) nx--;
+	if (px[p] < target_x) nx++;
+	else if (px[p] > target_x) nx--;
 
-	if (py[pnum] < target_y) ny++;
-	else if (py[pnum] > target_y) ny--;
+	if (py[p] < target_y) ny++;
+	else if (py[p] > target_y) ny--;
 
 	if (placable(nx, ny)) {
-		move_tail(pnum, nx, ny);
+		move_tail(p, nx, ny);
+	}
+	else if (nx == target_x && ny == target_y) {
+		if (check) {
+			move_tail(p, nx, ny);
+			itm_take[itm_or_player_num] = false;
+			player[p].hasitem = true;
+			player[p].item = item[itm_or_player_num]; // 포인터 주소값으로 연결해줌.
+
+		}
+		else {
+
+		}
 	}
 }
 
-bool ck_near_itm(int pnum, int* itm_or_player_num) {
-	double len = 0.;
+bool ck_near_itm(int p, int* itm_or_player_num) {
+	int len = INT_MAX;
 	bool itmT_or_playerF = true;
 	int short_index = 0;
 
 	for (int i = 0; i < n_item; i++) {
-		// 아이템과 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
-		int dx = abs(itmx[i] - px[pnum]); int dy = abs(itmy[i] - py[pnum]);
+		if (itm_take[i] == true) {
+			// 아이템과 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
+			int lena = abs(px[p] - itmx[i]) + abs(py[p] - itmy[i]);
 
-		int x = dx * dx; int y = dy * dy;
-		double lena = sqrt(x + y);
-
-		//len이 작은 것을 찾는 것이기 때문에 0이 들어가면 계속 0이기 때문.
-		if (i == 0) { len = lena; continue; }
-
-		// 길이가 짧으면 lena로 교체, 그리고 itm 번호를 저장
-		if (lena < len) { len = lena; short_index = i; }
+			// 길이가 짧으면 lena로 교체, 그리고 itm 번호를 저장
+			if (lena < len) { len = lena; short_index = i; }
+		}
 	}
 
 	for (int i = 0; i < n_player; i++) {
-		if (i == player[i].hasitem && i != pnum && player[i].is_alive == true ) {
+		if (player[i].hasitem && i != p && player[i].is_alive == true ) {
 			// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
-			int dx = abs(px[i] - px[pnum]); int dy = abs(py[i] - py[pnum]);
-
-			int x = dx * dx; int y = dy * dy;
-			double lena = sqrt(x + y);
+			int lena = abs(px[p] - px[i]) + abs(py[p] - py[i]);
 
 			// 길이가 짧으면 lena로 교체, 그리고 player 번호를 저장
 			if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
@@ -113,16 +119,8 @@ bool ck_near_itm(int pnum, int* itm_or_player_num) {
 
 	*itm_or_player_num = short_index;
 
-	// itm이 
-	if (itmT_or_playerF == true) {
-		return true;
-	}
-	else {
-		return false;
-	}
-
-
-	
+	if (itmT_or_playerF == true) { return true; }
+	else if (itmT_or_playerF == false){ return false; }
 }
 
 void nightgame(void) {
@@ -142,8 +140,19 @@ void nightgame(void) {
 
 		//0을 제외한 플레이어 아이템(혹은 아이템 가진 플레이어)로 이동하는 코드
 		for (int i = 1; i < n_player; i++) {
-			if (player[i].is_alive == true && tick % period[i] == 0) {
+			if (player[i].is_alive && tick % period[i] == 0) {
 				ngmv_random(i);
+			}
+		}
+
+		for (int i = 0; i < n_player; i++) {
+			if (player[i].is_alive) {
+				if (player[i].hasitem) {
+
+				}
+				else {
+
+				}
 			}
 		}
 
