@@ -11,6 +11,7 @@
 
 void ng_init();
 void ngmv_random(int);
+void itraction(bool, int, int, int, int);
 void nightgame();
 void cg_item(int, int);
 bool ck_near_itm(int, int*);
@@ -59,9 +60,9 @@ void ngmv_random(int p) {
 	int itm_or_player_num;
 	int nx = px[p], ny = py[p];  // 움직여서 다음에 놓일 자리
 	int target_x, target_y;
-	
+	bool check = ck_near_itm(p, &itm_or_player_num);
 
-	if (ck_near_itm(p, &itm_or_player_num)) {
+	if (check) {
 		//item index인 경우
 		target_x = itmx[itm_or_player_num]; target_y = itmy[itm_or_player_num];
 	}
@@ -79,11 +80,14 @@ void ngmv_random(int p) {
 	if (placable(nx, ny)) {
 		move_tail(p, nx, ny);
 	}
+	else if (nx == target_x && ny == target_y) {
+		itraction(check, itm_or_player_num, p, nx, ny);
+	}
 
 }
 
-void itraction() {
-		else if (nx == target_x && ny == target_y) {
+void itraction(bool check, int itm_or_player_num, int p, int nx, int ny) {
+		
 			//아이템에 접근하는 경우
 			if (check) {
 				if (player[p].hasitem == false) {
@@ -91,6 +95,9 @@ void itraction() {
 					itm_take[itm_or_player_num] = false;
 					player[p].hasitem = true;
 					player[p].item = item[itm_or_player_num]; // 포인터 주소값으로 연결해줌.
+					char msgp[30];
+					sprintf_s(msgp, sizeof(msgp), "player %d 아이템 획득", p);
+					dialog(msgp);
 				}
 				else {
 					cg_item(p, itm_or_player_num);
@@ -100,7 +107,6 @@ void itraction() {
 			// 아이템 가진 플레이어에 접근하는 경우
 			else {
 
-			}
 			}
 }
 
@@ -113,7 +119,9 @@ void cg_item(int p, int itmnum) {
 		while (1) {
 			key_t key = get_key();
 			if (key == K_YES) {
+				ITEM temp = player[p].item;
 				player[p].item = item[itmnum];
+				item[itmnum] = temp;
 				dialog("0번 아이템 교체됨");
 				break;
 			}
@@ -126,8 +134,7 @@ void cg_item(int p, int itmnum) {
 		if (choose == 0) {}
 		else {
 			player[p].item = item[itmnum];
-			char msgp[100];
-
+			char msgp[30];
 			sprintf_s(msgp, sizeof(msgp), "player %d 아이템 교체", p);
 			dialog(msgp);
 		}
@@ -187,7 +194,6 @@ void nightgame(void) {
 			}
 		}
 
-		// 모든 플레이어 감시
 		for (int i = 0; i < n_player; i++) {
 			if (player[i].is_alive) {
 				if (player[i].hasitem) {

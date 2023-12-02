@@ -45,7 +45,7 @@ void map_init(int n_row, int n_col) {
 bool placable(int row, int col) {
 	if (row < 0 || row >= N_ROW ||
 		col < 0 || col >= N_COL ||
-		back_buf[row][col] != ' ' || back_buf[row][col] != 'I') {
+		back_buf[row][col] != ' ') {
 		return false;
 	}
 	return true;
