@@ -77,7 +77,8 @@ void ngmv_random(int p) {
 	if (py[p] < target_y) ny++;
 	else if (py[p] > target_y) ny--;
 
-	if (placable(nx, ny)) {
+
+	if (placable(nx, ny) && p != 0) {
 		move_tail(p, nx, ny);
 	}
 	else if (nx == target_x && ny == target_y) {
@@ -91,7 +92,7 @@ void itraction(bool check, int itm_or_player_num, int p, int nx, int ny) {
 	//아이템에 접근하는 경우
 	if (check) {
 		if (player[p].hasitem == false) {
-			move_tail(p, nx, ny);
+			back_buf[itmx[itm_or_player_num]][itmy[itm_or_player_num]] = ' ';
 			itmx[itm_or_player_num] = -1; itmy[itm_or_player_num] = -1;
 			player[p].hasitem = true;
 			player[p].item = item[itm_or_player_num]; // 포인터 주소값으로 연결해줌.
@@ -106,8 +107,17 @@ void itraction(bool check, int itm_or_player_num, int p, int nx, int ny) {
 	}
 	// 아이템 가진 플레이어에 접근하는 경우
 	else {
+		if (player[itm_or_player_num].hasitem) {
+			cg_player_itm();
+		}
+		else {
 
+		}
 	}
+}
+
+void cg_player_itm() {
+
 }
 
 void cg_item(int p, int itmnum) {
@@ -125,7 +135,7 @@ void cg_item(int p, int itmnum) {
 		while (1) {
 			key_t key = get_key();
 			if (key == K_YES) {
-				move_tail(p, itmx[itmnum], itmy[itmnum]);
+				back_buf[itmx[itmnum]][itmy[itmnum]] = ' ';
 				itmx[itmnum] = -1; itmy[itmnum] = -1;
 				ITEM temp = player[p].item;
 				player[p].item = item[itmnum];
@@ -136,9 +146,12 @@ void cg_item(int p, int itmnum) {
 				back_buf[nnx][nny] = 'I';
 
 				dialog("0번 아이템 교체됨");
+				gotoxy(N_ROW, 0);
+				printf("                                      ");
 				break;
 			}
 			if (key == K_NO) {
+				back_buf[itmx[itmnum]][itmy[itmnum]] = ' ';
 				move_tail(p, itmx[itmnum], itmy[itmnum]);
 				itmx[itmnum] = nnx;
 				itmy[itmnum] = nny;
@@ -154,7 +167,7 @@ void cg_item(int p, int itmnum) {
 	}
 	else {
 		if (choose == 0) {
-			move_tail(p, itmx[itmnum], itmy[itmnum]);
+			back_buf[itmx[itmnum]][itmy[itmnum]] = ' ';
 			itmx[itmnum] = -1; itmy[itmnum] = -1;
 			ITEM temp = player[p].item;
 			player[p].item = item[itmnum];
@@ -166,10 +179,11 @@ void cg_item(int p, int itmnum) {
 
 			char msgp[30];
 			sprintf_s(msgp, sizeof(msgp), "player %d 아이템 교체", p);
-			dialog(msgp);
+			gotoxy(N_ROW, 0);
+			printf("%s", msgp);
 		}
 		else {
-			move_tail(p, itmx[itmnum], itmy[itmnum]);
+			back_buf[itmx[itmnum]][itmy[itmnum]] = ' ';
 			itmx[itmnum] = nnx;
 			itmy[itmnum] = nny;
 			back_buf[nnx][nny] = 'I';
@@ -196,6 +210,7 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 			if (lena < len) { len = lena; short_index = i; }
 		}
 	}
+	if (len == INT_MAX) { return 0; }// 아이템 남은 게 없으면 끝나게 하는 임시 제한 코드
 
 	/*for (int i = 0; i < n_player; i++) {
 		if (player[i].hasitem && i != p && player[i].is_alive == true) {
@@ -225,6 +240,7 @@ void nightgame(void) {
 			break;
 		}
 		else if (key != K_UNDEFINED) {
+			ngmv_random(0);
 			move_manual(key);
 		}
 
