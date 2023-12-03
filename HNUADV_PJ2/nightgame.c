@@ -313,14 +313,17 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 		}
 	}
 	//if (len == INT_MAX) { return 0; }// 아이템 남은 게 없으면 끝나게 하는 임시 제한 코드
+	
+	//아이템이 다 안먹혔을 때 아이템 먼저 추적하도록 제한
+	if (len == INT_MAX) {
+		for (int i = 0; i < n_player; i++) {
+			if (player[i].hasitem && i != p && player[i].is_alive == true) {
+				// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
+				int lena = abs(px[p] - px[i]) + abs(py[p] - py[i]);
 
-	for (int i = 0; i < n_player; i++) {
-		if (player[i].hasitem && i != p && player[i].is_alive == true) {
-			// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
-			int lena = abs(px[p] - px[i]) + abs(py[p] - py[i]);
-
-			// 길이가 짧으면 lena로 교체, 그리고 player 번호를 저장
-			if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
+				// 길이가 짧으면 lena로 교체, 그리고 player 번호를 저장
+				if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
+			}
 		}
 	}
 
@@ -363,7 +366,6 @@ void nightgame(void) {
 				}
 			}
 		}
-
 
 		display();
 		Sleep(10);
