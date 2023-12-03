@@ -13,6 +13,9 @@ bool is_valid(key_t key) {
 		K_SPACE,
 		K_YES,
 		K_NO,
+		K_first,
+		K_second,
+		K_third,
 		K_QUIT
 	};
 
