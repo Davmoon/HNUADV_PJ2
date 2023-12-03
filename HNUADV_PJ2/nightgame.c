@@ -123,6 +123,8 @@ void cg_player_itm(int p, int itm_pnum) {
 
 	if (p == 0) {
 		gotoxy(N_ROW, 0);
+		printf("                                                    ");
+		gotoxy(N_ROW, 0);
 		printf("%d번을 1:강탈 2:회유 3:무시", itm_pnum);
 		while (1) {
 			key_t key = get_key();
