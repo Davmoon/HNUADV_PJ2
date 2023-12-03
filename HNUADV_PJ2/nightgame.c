@@ -22,7 +22,7 @@ int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[P
 void ng_init(void) {
 	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
 	//int period_set[] = { 800,800,800,800,800,800,800,800,800,800 };
-	int period_set[] = { 200, 300, 400, 500, 600, 500, 400, 300, 200, 400 };
+	int period_set[] = { 250, 260, 270, 280, 290, 300, 310, 320, 330, 340 };
 
 	int x, y;
 	for (int i = 0; i < PLAYER_MAX; i++) {
@@ -34,7 +34,7 @@ void ng_init(void) {
 			} while (!placable(x, y));
 			px[i] = x;
 			py[i] = y;
-			period[i] = period_set[i];
+			period[i] = randint(300, 500);
 
 			back_buf[px[i]][py[i]] = '0' + i;  // (0 .. n_player-1)
 		}
@@ -71,15 +71,17 @@ void ngmv_random(int p) {
 		// 플레이어 index인 경우
 		target_x = px[itm_or_player_num]; target_y = py[itm_or_player_num];
 	}
+	
+	// 밸런스를 위해 변수를 줌.
+	if (randint(1, 8) != 1) {
+		if (px[p] < target_x) nx++;
+		else if (px[p] > target_x) nx--;
 
-	if (px[p] < target_x) nx++;
-	else if (px[p] > target_x) nx--;
+		if (py[p] < target_y) ny++;
+		else if (py[p] > target_y) ny--;
+	}
 
-	if (py[p] < target_y) ny++;
-	else if (py[p] > target_y) ny--;
-
-
-	if (placable(nx, ny) && p != 0) {
+	if (p != 0 && placable(nx, ny) ) {
 		move_tail(p, nx, ny);
 	}
 	else if (nx == target_x && ny == target_y) {
@@ -174,7 +176,7 @@ void cg_player_itm(int p, int itm_pnum) {
 			gotoxy(N_ROW, 0);
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
-			printf("0번 플레이어가 강탈에 성공");
+			printf("0번 플레이어가 회유에 성공");
 
 			//플레이어가 아이템이 있을 때
 			if (player[p].hasitem) {
@@ -315,7 +317,7 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 	//if (len == INT_MAX) { return 0; }// 아이템 남은 게 없으면 끝나게 하는 임시 제한 코드
 	
 	//아이템이 다 안먹혔을 때 아이템 먼저 추적하도록 제한
-	if (len == INT_MAX) {
+	if (p == 0 || len == INT_MAX) {
 		for (int i = 0; i < n_player; i++) {
 			if (player[i].hasitem && i != p && player[i].is_alive == true) {
 				// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
@@ -347,6 +349,7 @@ void nightgame(void) {
 		else if (key != K_UNDEFINED) {
 			ngmv_random(0);
 			move_manual(key);
+			ngmv_random(0);
 		}
 
 		//0을 제외한 플레이어 아이템(혹은 아이템 가진 플레이어)로 이동하는 코드
@@ -356,16 +359,7 @@ void nightgame(void) {
 			}
 		}
 
-		for (int i = 0; i < n_player; i++) {
-			if (player[i].is_alive) {
-				if (player[i].hasitem) {
-
-				}
-				else {
-
-				}
-			}
-		}
+		// 몇분마다 스테미나 추가해줘야 할까? 모르겠다...
 
 		display();
 		Sleep(10);
