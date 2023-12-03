@@ -78,7 +78,7 @@ void print_status(void) {
 	printf("\t\t\tintl\tstr\tstm\n");
 
 	for (int p = 0; p < n_player; p++) {
-		printf("player %02d: %5s\t%02d(%d)\t%02d(%d)\t%03d%%(%d)\n",
+		printf("player %02d: %5s\t%02d(%d)\t%02d(%d)\t%03d%%(%d)\t%s\n",
 			p,
 			player[p].is_alive ? "alive" : "DEAD",
 			player[p].intel,
@@ -86,7 +86,8 @@ void print_status(void) {
 			player[p].str,
 			player[p].item.str_buf,
 			player[p].stamina,
-			player[p].item.stamina_buf
+			player[p].item.stamina_buf,
+			player[p].item.name
 			);
 	}
 }
