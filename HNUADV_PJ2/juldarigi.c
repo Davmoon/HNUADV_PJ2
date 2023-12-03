@@ -252,6 +252,7 @@ void player_list() {
 			if (strcmp(dead[i].name, player[i].name) == 0) {
 				printf("alive\n"); //이미 살았던 플레이어는 죽지 않음 대신 **개로 표시
 				player[i].hasitem = false; //플레이어의 아이템 몰수
+				player[i].intel = player[i].intel / 2; // 플레이어의 지능 반토막
 			}
 			else {
 				printf("alive\n");
