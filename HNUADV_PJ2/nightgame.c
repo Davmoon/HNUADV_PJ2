@@ -349,7 +349,6 @@ void nightgame(void) {
 		else if (key != K_UNDEFINED) {
 			ngmv_random(0);
 			move_manual(key);
-			ngmv_random(0);
 		}
 
 		//0을 제외한 플레이어 아이템(혹은 아이템 가진 플레이어)로 이동하는 코드
