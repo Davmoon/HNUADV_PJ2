@@ -21,8 +21,8 @@ int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[P
 
 void ng_init(void) {
 	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
-	int period_set[] = { 800,800,800,800,800,800,800,800,800,800 };
-	//int period_set[] = { 250, 260, 270, 280, 290, 300, 310, 320, 330, 340 };
+	//int period_set[] = { 800,800,800,800,800,800,800,800,800,800 };
+	int period_set[] = { 200, 300, 400, 500, 600, 500, 400, 300, 200, 400 };
 
 	int x, y;
 	for (int i = 0; i < PLAYER_MAX; i++) {
@@ -97,9 +97,13 @@ void itraction(bool check, int itm_or_player_num, int p, int nx, int ny) {
 			itmx[itm_or_player_num] = -1; itmy[itm_or_player_num] = -1;
 			player[p].hasitem = true;
 			player[p].item = item[itm_or_player_num]; // 포인터 주소값으로 연결해줌.
-			char msgp[30];
-			sprintf_s(msgp, sizeof(msgp), "player %d 아이템 획득", p);
-			dialog(msgp);
+			//char msgp[30];
+			//sprintf_s(msgp, sizeof(msgp), "player %d 아이템 획득", p);
+			//dialog(msgp);
+			gotoxy(N_ROW, 0);
+			printf("                                                    ");
+			gotoxy(N_ROW, 0);
+			printf("player %d 아이템 획득", p);
 		}
 		else {
 			cg_item(p, itm_or_player_num);
@@ -125,6 +129,8 @@ void cg_player_itm(int p, int itm_pnum) {
 			if (key == K_third) {select = 3; break;}
 		}
 		gotoxy(N_ROW, 0);
+		printf("                                                    ");
+		gotoxy(N_ROW, 0);
 		printf("당신의 선택한 숫자는 : %d", select);
 	}
 	else {
@@ -133,7 +139,9 @@ void cg_player_itm(int p, int itm_pnum) {
 	
 	switch (select) {
 	case 1: //플레이어가 스테미나가 높을 때
-		if (player[p].str > player[itm_pnum].str) {
+		if (player[p].str > 0 && player[p].str > player[itm_pnum].str) {
+			gotoxy(N_ROW, 0);
+			printf("                                                    ");
 			gotoxy(N_ROW, 0);
 			printf("0번 플레이어가 강탈에 성공");
 
@@ -155,12 +163,16 @@ void cg_player_itm(int p, int itm_pnum) {
 		}
 		else {
 			gotoxy(N_ROW, 0);
+			printf("                                                    ");
+			gotoxy(N_ROW, 0);
 			printf("%d번이 %d번에 대해 강탈 실패", p, itm_pnum);
 			player[p].stamina = ((player[p].stamina / 10) * 4);
 		}
 		break;
 	case 2: //회유하는 경우
-		if (player[p].intel > player[itm_pnum].intel) {
+		if (player[p].str > 0 && player[p].intel > player[itm_pnum].intel) {
+			gotoxy(N_ROW, 0);
+			printf("                                                    ");
 			gotoxy(N_ROW, 0);
 			printf("0번 플레이어가 강탈에 성공");
 
@@ -182,11 +194,15 @@ void cg_player_itm(int p, int itm_pnum) {
 		}
 		else {
 			gotoxy(N_ROW, 0);
+			printf("                                                    ");
+			gotoxy(N_ROW, 0);
 			printf("%d번이 %d번에 대해 강탈 실패", p, itm_pnum);
 			player[p].stamina = ((player[p].stamina / 10) * 6);
 		}
 		break;
 	case 3: //무시하는 경우
+		gotoxy(N_ROW, 0);
+		printf("                                                    ");
 		gotoxy(N_ROW, 0);
 		printf("%d번이 %d와 상호작용 무시", p, itm_pnum);
 		break;
@@ -206,6 +222,8 @@ void cg_item(int p, int itmnum) {
 
 	if (p == 0) {
 		gotoxy(N_ROW, 0);
+		printf("                                                    ");
+		gotoxy(N_ROW, 0);
 		printf("아이템을 교환하시겠습니까? y/n");
 		while (1) {
 			key_t key = get_key();
@@ -221,9 +239,11 @@ void cg_item(int p, int itmnum) {
 				itmy[itmnum] = nny;
 				back_buf[nnx][nny] = 'I';
 
-				dialog("0번 교체 허용, 아이템 랜덤 배치");
+				//dialog("0번 교체 허용, 아이템 랜덤 배치");
 				gotoxy(N_ROW, 0);
-				printf("                                      ");
+				printf("                                                    ");
+				gotoxy(N_ROW, 0);
+				printf("0번 교체 허용, 아이템 랜덤 배치");
 				break;
 			}
 			if (key == K_NO) {
@@ -233,7 +253,8 @@ void cg_item(int p, int itmnum) {
 				itmy[itmnum] = nny;
 				back_buf[nnx][nny] = 'I';
 
-				tick = 0;
+				gotoxy(N_ROW, 0);
+				printf("                                                    ");
 				gotoxy(N_ROW, 0);
 				printf("0번 교체 거부, 아이템 랜덤 배치");
 
@@ -254,10 +275,12 @@ void cg_item(int p, int itmnum) {
 			itmy[itmnum] = nny;
 			back_buf[nnx][nny] = 'I';
 
-			char msgp[30];
-			sprintf_s(msgp, sizeof(msgp), "player %d 아이템 교체", p);
+			//char msgp[30];
+			//sprintf_s(msgp, sizeof(msgp), "player %d 아이템 교체", p);
 			gotoxy(N_ROW, 0);
-			printf("%s", msgp);
+			printf("                                                    ");
+			gotoxy(N_ROW, 0);
+			printf("player %d 아이템 교체", p);
 		}
 		else {
 			back_buf[itmx[itmnum]][itmy[itmnum]] = ' ';
@@ -266,7 +289,8 @@ void cg_item(int p, int itmnum) {
 			itmy[itmnum] = nny;
 			back_buf[nnx][nny] = 'I';
 
-			tick = 0;
+			gotoxy(N_ROW, 0);
+			printf("                                                    ");
 			gotoxy(N_ROW, 0);
 			printf("%d번 교체 거부, 아이템 랜덤 배치", p);
 
