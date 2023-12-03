@@ -20,7 +20,7 @@ int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[P
 
 void ng_init(void) {
 	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
-	int period_set[] = { 500,500,500,500,500,500,500,500,500,500 };
+	int period_set[] = { 800,800,800,800,800,800,800,800,800,800 };
 	//int period_set[] = { 250, 260, 270, 280, 290, 300, 310, 320, 330, 340 };
 
 	int x, y;
@@ -40,7 +40,7 @@ void ng_init(void) {
 	}
 
 	//item 랜덤 배치 추후 item 종류도 랜덤화 추가
-	for (int i = 0; i < n_alive - 1; i++) {
+	for (int i = 0; i < n_alive + 1; i++) {
 		do {
 			x = randint(1, N_ROW - 2);
 			y = randint(1, N_COL - 2);
@@ -97,7 +97,7 @@ void itraction(bool check, int itm_or_player_num, int p, int nx, int ny) {
 			player[p].item = item[itm_or_player_num]; // 포인터 주소값으로 연결해줌.
 			char msgp[30];
 			sprintf_s(msgp, sizeof(msgp), "player %d 아이템 획득", p);
-			dialog(msgp);
+			//dialog(msgp);
 		}
 		else {
 			cg_item(p, itm_or_player_num);
@@ -139,12 +139,15 @@ void cg_item(int p, int itmnum) {
 				break;
 			}
 			if (key == K_NO) {
+				move_tail(p, itmx[itmnum], itmy[itmnum]);
+				itm_take[itmnum] = true;
 				itmx[itmnum] = nnx;
 				itmy[itmnum] = nny;
 				back_buf[nnx][nny] = 'I';
 
 				gotoxy(N_ROW, 0);
-				printf("교체 거부, 아이템 랜덤 배치");
+				printf("%d번 교체 거부, 아이템 랜덤 배치", p);
+
 				break;
 			}
 		}
@@ -166,12 +169,15 @@ void cg_item(int p, int itmnum) {
 			dialog(msgp);
 		}
 		else {
+			move_tail(p, itmx[itmnum], itmy[itmnum]);
 			itmx[itmnum] = nnx;
 			itmy[itmnum] = nny;
 			back_buf[nnx][nny] = 'I';
+			itm_take[itmnum] = true;
 
 			gotoxy(N_ROW, 0);
-			printf("교체 거부, 아이템 랜덤 배치");
+			printf("%d번 교체 거부, 아이템 랜덤 배치", p);
+
 		}
 	}
 }
@@ -191,15 +197,15 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 		}
 	}
 
-	for (int i = 0; i < n_player; i++) {
-		if (player[i].hasitem && i != p && player[i].is_alive == true) {
-			// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
-			int lena = abs(px[p] - px[i]) + abs(py[p] - py[i]);
+	//for (int i = 0; i < n_player; i++) {
+	//	if (player[i].hasitem && i != p && player[i].is_alive == true) {
+	//		// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
+	//		int lena = abs(px[p] - px[i]) + abs(py[p] - py[i]);
 
-			// 길이가 짧으면 lena로 교체, 그리고 player 번호를 저장
-			if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
-		}
-	}
+	//		// 길이가 짧으면 lena로 교체, 그리고 player 번호를 저장
+	//		if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
+	//	}
+	//}
 
 	*itm_or_player_num = short_index;
 
@@ -240,7 +246,10 @@ void nightgame(void) {
 			}
 		}
 
-
+		if (tick % 3000 == 0) {
+			gotoxy(N_ROW, 0);
+			printf("                                ");
+		}
 
 		display();
 		Sleep(10);

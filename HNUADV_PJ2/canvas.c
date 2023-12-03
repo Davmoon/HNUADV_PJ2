@@ -78,7 +78,7 @@ void print_status(void) {
 	printf("\t\t\tintl\tstr\tstm\n");
 
 	for (int p = 0; p < n_player; p++) {
-		printf("player %02d: %5s\t%02d(%d)\t%02d(%d)\t%03d(%d)%%\n",
+		printf("player %02d: %5s\t%02d(%d)\t%02d(%d)\t%03d%%(%d)\n",
 			p,
 			player[p].is_alive ? "alive" : "DEAD",
 			player[p].intel,
@@ -131,7 +131,7 @@ void dialog(char message[]) {
 	}
 
 	gotoxy(Rmid + y, sec_x);
-	printf("                                         ");
+	printf("                                ");
 
 	// front 버퍼 비움, back은 save 버퍼로 복구
 	for (int i = 0; i < ROW_MAX; i++) {
