@@ -276,6 +276,18 @@ void mugunghwa(void) {
 		}
 		
 		pass_zone();
+
+		// 죽거나 패스한 플레이어 수가 처음 플레이어 수와 같으면 다음 게임으로 자동으로 넘어가는 함수
+		int temp = 0;
+		for (int i = 0; i < n_player; i++) {
+			if (player[i].is_alive == false || pass[i] == true) temp++;
+		}
+		if (temp == n_player) {
+			Sleep(1000);
+			dialog("게임 종료. 다음 게임 진행.");
+			break;
+		}
+
 		display();
 		//pass, kill 확인을 위한 테스트 코드
 		//for (int i = 0; i < n_player; i++) {

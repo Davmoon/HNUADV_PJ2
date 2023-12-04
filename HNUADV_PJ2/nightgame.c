@@ -352,7 +352,7 @@ void nightgame(void) {
 	display();
 	double timer = 30000.;
 
-	//dialog("      \"야간 운동\"     ");
+	dialog("      \"야간 운동\"     ");
 
 	while (1) {
 		// player 0만 손으로 움직임(4방향)
@@ -378,7 +378,8 @@ void nightgame(void) {
 		gotoxy(N_ROW + 3, 0);
 		printf("게임 종료까지 남은 시간 : %.2lf초", timer / 1000);
 		if (timer <= 0) {
-			dialog("게임 종료. 다음 게임으로 넘어갑니다.");
+			Sleep(1000);
+			dialog("게임 종료. 다음 게임 진행.");
 			break;
 		}
 		timer -= 10;
