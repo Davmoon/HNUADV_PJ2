@@ -31,43 +31,30 @@ void print_list(); //리스트 출력
 void end(); //게임 끝내기 + 데이터 갱신
 
 
+int px[PLAYER_MAX], py[PLAYER_MAX], jy[3];
+
 int a[2][PLAYER_MAX / 2]; //플레이어 리스트 전역변수로 선언
 char maps[3][29];
 float strs; // 힘
-int z; // 왼쪽으로 잡아당길때의 기준점
-int z2; //오른쪽으로 잡아당길때의 기준점
 PLAYER dead[6]; //죽은 사람의 번호를 넣을 배열
 int dead_count = 0; //죽은 사람이 몇명인지 카운트 하는 배열
+int dead_player = PLAYER_MAX + 1;
 float m_pw = 0;
 bool b_LLiedown = false;
 bool b_RLiedown = false;
 bool b_masteradd = false;
-
+char msg1[50];
+bool b_IsEnd = false;
 
 void map() { //맵 생성
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 29; j++) {
-			if (i == 0 || i == 2) {
-				if (j == 29 / 2)
-					maps[i][j] = ' ';
-				else
-				{
-					maps[i][j] = '#';
-				}
-			}
-			else if ((i == 1 && j == 0) || (i == 1 && j == 28)) {
-				maps[i][j] = '#';
-			}
-			else {
-				maps[i][j] = ' ';
-			}
-		}// 맵 생성
+	int row = 3;
+	int col = 29;
+	if (col % 2 != 1) {
+		col++;
 	}
+	juldarigi_map_init(row, col);
 
 	player_spawn();
-
-
-
 }
 
 void player_spawn() { //스폰
@@ -77,16 +64,21 @@ void player_spawn() { //스폰
 			y = 0;
 			x++;
 			for (int j = 0; j < 3; j++) {
-				maps[1][i + z + j] = '-';
+				jy[j] = i + z + j;
+				back_buf[1][jy[j]] = '-';
 			}
 			z += 3;
 			if (x == 1 && y == 0) {
-				maps[1][i + z] = a[x][y] + '0';
+				px[i] = 1;
+				py[a[x][y]] = i + z;
+				back_buf[px[i]][py[a[x][y]]] = a[x][y] + '0';
 				y++;
 			}
 		}
 		else {
-			maps[1][i + z] = a[x][y] + '0';
+			px[i] = 1;
+			py[a[x][y]] = i + z;
+			back_buf[px[i]][py[a[x][y]]] = a[x][y] + '0';
 			y++;
 		}
 	}
@@ -97,84 +89,184 @@ void player_change() {
 	{
 		for (int count = 0; count < 2; count++) {
 			if (strs < 0) { // 힘이 음수일때
-				if (maps[1][15] != '-')
-				{
-
-					dead[dead_count] = player[(maps[1][15] - '0')];
-					dead_count++;
-					for (int i = 14; i < 14 + ((n_player / 2) + 1); i++) {
-
-						maps[1][i + 1] = maps[1][i + 2];
-					}
-
+				if (back_buf[1][(29 / 2 + 29 % 2)] == ' ') {
+					b_IsEnd = true;
+					break;
 				}
 				else {
-					for (int i = z; i < z + (n_player + 5); i++) {
-						maps[1][i - 1] = maps[1][i];
+					if (back_buf[1][(29 / 2 + 29 % 2)] != '-')
+					{
+
+						dead[dead_count] = player[(back_buf[1][(29 / 2 + 29 % 2)] - '0')];
+						dead_count++;
+						dead_player = back_buf[1][(29 / 2 + 29 % 2)] - '0';
+
+						for (int i = 0; i < n_player; i++) {
+							if (i % 2 != 0) {
+								back_buf[px[i]][py[i]] = ' ';
+								if (back_buf[px[i]][py[i] - 1] != '-' && placable(px[i], py[i] - 1)) {
+									py[i] = py[i] - 1;
+									back_buf[px[i]][py[i]] = i + '0';
+								}
+							}
+						}
 					}
-					z--; //기준점 갱신
+					else {
+						for (int i = 0; i < n_player; i++) {
+							if (back_buf[px[i]][py[i]] == i + '0')
+							{
+								back_buf[px[i]][py[i]] = ' ';
+							}
+							py[i] = py[i] - 1;
+							back_buf[px[i]][py[i]] = i + '0';
+						}
+						for (int j = 0; j < 3; j++) {
+							if (back_buf[1][jy[j]] == '-')
+							{
+								back_buf[1][jy[j]] = ' ';
+							}
+							jy[j] = jy[j] - 1;
+							back_buf[1][jy[j]] = '-';
+						}
+					}
 				}
 			}
 			else if (strs > 0) { //힘이 양수일때
-				if (maps[1][13] != '-')
-				{
-					dead[dead_count] = player[(maps[1][13] - '0')];
-					dead_count++;
-					for (int i = 14; i > 14 - ((n_player / 2) + 1); i--) {
-						maps[1][i - 1] = maps[1][i - 2];
-					}
+				if (back_buf[1][(29 / 2 - 29 % 2)] == ' ') {
+					b_IsEnd = true;
+					break;
 				}
 				else {
-					for (int i = z2; i > z2 - (n_player + 4); i--) {
-						maps[1][i - 1] = maps[1][i - 2];
+					if (back_buf[1][(29 / 2 - 29 % 2)] != '-')
+					{
+
+						dead[dead_count] = player[(back_buf[1][(29 / 2 - 29 % 2)] - '0')];
+						dead_count++;
+						dead_player = back_buf[1][(29 / 2 - 29 % 2)] - '0';
+
+						for (int i = 0; i < n_player; i++) {
+							if (i % 2 == 0) {
+								back_buf[px[i]][py[i]] = ' ';
+								if (back_buf[px[i]][py[i] + 1] != '-' && placable(px[i], py[i] + 1)) {
+									py[i] = py[i] + 1;
+									back_buf[px[i]][py[i]] = i + '0';
+								}
+							}
+						}
 					}
-					z2++;//기준점 갱신
+					else {
+						for (int i = 0; i < n_player; i++) {
+							if (back_buf[px[i]][py[i]] == i + '0')
+							{
+								back_buf[px[i]][py[i]] = ' ';
+							}
+							py[i] = py[i] + 1;
+							back_buf[px[i]][py[i]] = i + '0';
+						}
+						for (int j = 2; j >= 0; j--) {
+							if (back_buf[1][jy[j]] == '-')
+							{
+								back_buf[1][jy[j]] = ' ';
+							}
+							jy[j] = jy[j] + 1;
+							back_buf[1][jy[j]] = '-';
+						}
+					}
 				}
 			}
 			else { //힘이 0일때
-				maps[3][29];
+
 			}
 		}
 	}
 	else
 	{
 		if (strs < 0) { // 힘이 음수일때
-			if (maps[1][15] != '-')
-			{
-
-				dead[dead_count] = player[(maps[1][15] - '0')];
-				dead_count++;
-				for (int i = 14; i < 14 + ((n_player / 2) + 2); i++) {
-
-					maps[1][i + 1] = maps[1][i + 2];
-				}
-
+			if (back_buf[1][(29 / 2 + 29 % 2)] == ' ') {
+				b_IsEnd = true;
 			}
 			else {
-				for (int i = z; i < z + (n_player + 6); i++) {
-					maps[1][i - 1] = maps[1][i];
+				if (back_buf[1][(29 / 2 + 29 % 2)] != '-')
+				{
+
+					dead[dead_count] = player[(back_buf[1][(29 / 2 + 29 % 2)] - '0')];
+					dead_count++;
+					dead_player = back_buf[1][(29 / 2 + 29 % 2)] - '0';
+
+					for (int i = 0; i < n_player; i++) {
+						if (i % 2 != 0) {
+							back_buf[px[i]][py[i]] = ' ';
+							if (back_buf[px[i]][py[i] - 1] != '-' && placable(px[i], py[i] - 1)) {
+								py[i] = py[i] - 1;
+								back_buf[px[i]][py[i]] = i + '0';
+							}
+						}
+					}
 				}
-				z--; //기준점 갱신
+				else {
+					for (int i = 0; i < n_player; i++) {
+						if (back_buf[px[i]][py[i]] == i + '0')
+						{
+							back_buf[px[i]][py[i]] = ' ';
+						}
+						py[i] = py[i] - 1;
+						back_buf[px[i]][py[i]] = i + '0';
+					}
+					for (int j = 0; j < 3; j++) {
+						if (back_buf[1][jy[j]] == '-')
+						{
+							back_buf[1][jy[j]] = ' ';
+						}
+						jy[j] = jy[j] - 1;
+						back_buf[1][jy[j]] = '-';
+					}
+				}
 			}
 		}
 		else if (strs > 0) { //힘이 양수일때
-			if (maps[1][13] != '-')
-			{
-				dead[dead_count] = player[(maps[1][13] - '0')];
-				dead_count++;
-				for (int i = 14; i > 14 - ((n_player / 2) + 2); i--) {
-					maps[1][i - 1] = maps[1][i - 2];
-				}
+			if (back_buf[1][(29 / 2 - 29 % 2)] == ' ') {
+				b_IsEnd = true;
 			}
 			else {
-				for (int i = z2; i > z2 - (n_player + 5); i--) {
-					maps[1][i - 1] = maps[1][i - 2];
+				if (back_buf[1][(29 / 2 - 29 % 2)] != '-')
+				{
+
+					dead[dead_count] = player[(back_buf[1][(29 / 2 - 29 % 2)] - '0')];
+					dead_count++;
+					dead_player = back_buf[1][(29 / 2 - 29 % 2)] - '0';
+
+					for (int i = 0; i < n_player; i++) {
+						if (i % 2 == 0) {
+							back_buf[px[i]][py[i]] = ' ';
+							if (back_buf[px[i]][py[i] + 1] != '-' && placable(px[i], py[i] + 1)) {
+								py[i] = py[i] + 1;
+								back_buf[px[i]][py[i]] = i + '0';
+							}
+						}
+					}
 				}
-				z2++;//기준점 갱신
+				else {
+					for (int i = 0; i < n_player; i++) {
+						if (back_buf[px[i]][py[i]] == i + '0')
+						{
+							back_buf[px[i]][py[i]] = ' ';
+						}
+						py[i] = py[i] + 1;
+						back_buf[px[i]][py[i]] = i + '0';
+					}
+					for (int j = 2; j >= 0; j--) {
+						if (back_buf[1][jy[j]] == '-')
+						{
+							back_buf[1][jy[j]] = ' ';
+						}
+						jy[j] = jy[j] + 1;
+						back_buf[1][jy[j]] = '-';
+					}
+				}
 			}
 		}
 		else { //힘이 0일때
-			maps[3][29]; //상태 유지
+
 		}
 	}
 }
@@ -198,11 +290,11 @@ void gamemaster() {
 			m_pw++;
 		}
 		else if (ch == 'q' || ch == 'Q') {
-			printf("\nQuitting the program.\n");
-
+			juldarigi_dialog(" \"게임마스터가 줄다리기를 종료하였습니다.\"");
+			b_IsEnd = true;
 		}
 		else if (ch == 'x' || ch == 'X') {
-			printf("\n왼쪽 팀 눕기 사용.\n");
+			juldarigi_dialog(" \"왼쪽팀이 눕기를 사용하였습니다.\"");
 			b_LLiedown = true;
 			for (int i = 0; i < n_player / 2; i++) {
 				if (player[a[0][i]].stamina > 0) {
@@ -211,7 +303,7 @@ void gamemaster() {
 			}
 		}
 		else if (ch == '.') {
-			printf("\n오른쪽 팀 눕기 사용.\n");
+			juldarigi_dialog(" \"오른쪽팀이 눕기를 사용하였습니다.\"");
 			b_RLiedown = true;
 			for (int i = 0; i < n_player / 2; i++) {
 				if (player[a[1][i]].stamina > 0) {
@@ -238,12 +330,8 @@ void end() {
 		}
 		else if (player[i].status == 3) {
 			player[i].is_alive = false; //탈락한 사람이 이번게임에서 탈락했기 때문에 진짜 사망처리
- 		}
+		}
 	}
-
-
-
-
 }
 
 
@@ -264,18 +352,13 @@ void game() { // 게임 조작, 플레이
 		// 1초 경과 시에 원하는 동작 수행
 		if (elapsed_time >= 1.0) {
 
+			player_list(); //리스트 생성 
 
-			system("cls");
-
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 29; j++) {
-					printf("%c", maps[i][j]);
-
-				}
-				printf("\n");
+			if (b_IsEnd) {
+				break;
 			}
 
-			player_list(); //리스트 생성 
+			juldarigi_display();
 
 			power();
 
@@ -284,13 +367,18 @@ void game() { // 게임 조작, 플레이
 			b_LLiedown = false;
 			b_RLiedown = false;
 
+			if (dead_player != PLAYER_MAX + 1) {
+				sprintf(msg1, "%d %s", dead_player, "번 플레이어 탈락!");
+				juldarigi_dialog(msg1);
+				dead_player = PLAYER_MAX + 1;
+			}
+
 			// 다시 시작 시간을 현재 시간으로 업데이트
 			start_time = clock();
 		}
 		gamemaster();
 
 	}
-
 }
 
 void power() { // 힘 계산
@@ -357,9 +445,6 @@ void power() { // 힘 계산
 
 //리스트 생성
 void player_list() {
-
-
-	printf("no. of player left : %d\n", sizeof(player) / sizeof(PLAYER));
 	for (int i = 0; i < n_player; i++) { //모든 플레이어가 과거 죽었는지 살았는지 확인하는 반복문
 		if (player[i].is_alive == true) { //과거 살았던 상태인지
 			player[i].status = 2;
@@ -383,35 +468,6 @@ void player_list() {
 			}
 		}
 	}
-	print_list(); //리스트 출력
-
-
-
-}
-
-void print_list() {
-	for (int i = 0; i < n_player; i++) {
-
-		switch (player[i].status) {
-		case 1:
-			printf("player %d: alive**\n", i); //탈락하지 않은 플레이어 죽으면 **
-			break;
-		case 2:
-			printf("player %d: alive\n", i); //살아있는 상태
-			break;
-		case 3:
-			printf("player %d: DEAD\n", i); //플레이어 사망
-			break;
-		case 4:
-			printf("player %d: alive*\n", i); //탈락했던 사람
-			break;
-
-		default:
-			break;
-
-		}
-	}
-
 }
 
 //팀 설정
@@ -439,14 +495,9 @@ void team_mate() {
 			}
 		}
 	}
-
-
-
-
 }
 
 int juldarigi_init(void) {
-	srand((unsigned int)time(NULL));
 
 	FILE* fp;
 	fopen_s(&fp, DATA_FILE, "r");
@@ -471,24 +522,17 @@ int juldarigi_init(void) {
 	}
 
 	fclose(fp);
-
-	z = (29 / 2) - ((n_player / 2) + 1);
-	z2 = (29 / 2) + ((n_player / 2) + 3);
 	return 0;
 }
 
-
 void juldarigi() {
-	player[0].is_alive = false;
-
 	juldarigi_init();
 
 	team_mate();
-
 
 	map();
 
 
 	game();
-
+	end();
 }

@@ -4,24 +4,24 @@
 #include <Windows.h>
 #include <stdbool.h>
 
-#define PLAYER_MAX		10
-#define ITEM_MAX	10
+#define PLAYER_MAX        6
+#define ITEM_MAX    10
 
 typedef struct {
-	char name[100];
-	int intel_buf, str_buf, stamina_buf;
+    char name[100];
+    int intel_buf, str_buf, stamina_buf;
 }ITEM;
 
 typedef struct {
-	int id;
-	char name[100];
+    int id;
+    char name[100];
 
-	// 능력치: 지능, 힘, 스태미나 d
-	int intel, str, stamina, status;
+    // 능력치: 지능, 힘, 스태미나
+    int intel, str, stamina, status;
 
-	bool is_alive;
-	bool hasitem;
-	ITEM item;
+    bool is_alive;
+    bool hasitem;
+    ITEM item;
 }PLAYER;
 
 PLAYER player[PLAYER_MAX];  // 기본값 true, 탈락하면 false

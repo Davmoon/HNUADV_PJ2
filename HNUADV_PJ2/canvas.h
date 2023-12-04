@@ -24,5 +24,8 @@ bool placable(int row, int col);
 void display(void);
 void gotoxy(int x, int y);
 void printxy(char ch, int row, int col);
-
+void juldarigi_dialog(char message[]);
+void juldarigi_print_status(void);
+void juldarigi_display(void);
+void juldarigi_map_init(int n_row, int n_col);
 #endif
