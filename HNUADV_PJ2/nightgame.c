@@ -22,7 +22,7 @@ int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[P
 void ng_init(void) {
 	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
 	//int period_set[] = { 800,800,800,800,800,800,800,800,800,800 };
-	int period_set[] = { 250, 260, 270, 280, 290, 300, 310, 320, 330, 340 };
+	int period_set[] = { 420, 430, 440, 400, 410, 440, 440, 430, 430, 410 };
 
 	int x, y;
 	for (int i = 0; i < PLAYER_MAX; i++) {
@@ -34,7 +34,7 @@ void ng_init(void) {
 			} while (!placable(x, y));
 			px[i] = x;
 			py[i] = y;
-			period[i] = randint(300, 500);
+			period[i] = period_set[i];
 
 			back_buf[px[i]][py[i]] = '0' + i;  // (0 .. n_player-1)
 		}
@@ -61,6 +61,7 @@ void ngmv_random(int p) {
 	int itm_or_player_num;
 	int nx = px[p], ny = py[p];  // 움직여서 다음에 놓일 자리
 	int target_x, target_y;
+	bool counter = true;
 	bool check = ck_near_itm(p, &itm_or_player_num);
 
 	if (check) {
@@ -72,11 +73,11 @@ void ngmv_random(int p) {
 		target_x = px[itm_or_player_num]; target_y = py[itm_or_player_num];
 	}
 	
-	// 밸런스를 위해 변수를 줌.
-	if (randint(1, 8) != 1) {
-		if (px[p] < target_x) nx++;
-		else if (px[p] > target_x) nx--;
 
+	if (px[p] < target_x) { nx++; counter = false; }
+	else if (px[p] > target_x) { nx--; counter = false; }
+
+	if (counter) {
 		if (py[p] < target_y) ny++;
 		else if (py[p] > target_y) ny--;
 	}
@@ -147,7 +148,8 @@ void cg_player_itm(int p, int itm_pnum) {
 			gotoxy(N_ROW, 0);
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
-			printf("0번 플레이어가 강탈에 성공");
+			printf("%d번이 %d번에 대해 강탈 성공", p, itm_pnum);
+			Sleep(1000);
 
 			//플레이어가 아이템이 있을 때
 			if (player[p].hasitem) {
@@ -170,6 +172,8 @@ void cg_player_itm(int p, int itm_pnum) {
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
 			printf("%d번이 %d번에 대해 강탈 실패", p, itm_pnum);
+			Sleep(1000);
+
 			player[p].stamina = ((player[p].stamina / 10) * 4);
 		}
 		break;
@@ -178,7 +182,8 @@ void cg_player_itm(int p, int itm_pnum) {
 			gotoxy(N_ROW, 0);
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
-			printf("0번 플레이어가 회유에 성공");
+			printf("%d번이 %d번에 대해 회유 성공", p, itm_pnum);
+			Sleep(1000);
 
 			//플레이어가 아이템이 있을 때
 			if (player[p].hasitem) {
@@ -200,7 +205,9 @@ void cg_player_itm(int p, int itm_pnum) {
 			gotoxy(N_ROW, 0);
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
-			printf("%d번이 %d번에 대해 강탈 실패", p, itm_pnum);
+			printf("%d번이 %d번에 대해 회유 실패", p, itm_pnum);
+			Sleep(1000);
+
 			player[p].stamina = ((player[p].stamina / 10) * 6);
 		}
 		break;
@@ -209,6 +216,8 @@ void cg_player_itm(int p, int itm_pnum) {
 		printf("                                                    ");
 		gotoxy(N_ROW, 0);
 		printf("%d번이 %d와 상호작용 무시", p, itm_pnum);
+		Sleep(1000);
+
 		break;
 	default:
 		return 0;
