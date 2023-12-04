@@ -128,7 +128,7 @@ void jebi(void) {
 	jebi_init();
 	system("cls");
 	display();
-	dialog("\"제비뽑기 게임 start!\"");
+	dialog("\"   제비뽑기 게임   \"");
 	int sel_kill = randint(0, n_alive - 1);
 	
 

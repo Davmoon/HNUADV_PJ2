@@ -78,7 +78,7 @@ void print_status(void) {
 	printf("\t\t\tintl\tstr\tstm\n");
 
 	for (int p = 0; p < n_player; p++) {
-		printf("player %02d: %5s\t%02d(%d)\t%02d(%d)\t%03d%%(%d)\t%s\n",
+		printf("player %02d: %5s\t%02d(%d)\t%02d(%d)\t%03d%%(%d)\t%5s\n",
 			p,
 			player[p].is_alive ? "alive" : "DEAD",
 			player[p].intel,
