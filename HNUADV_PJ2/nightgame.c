@@ -149,7 +149,7 @@ void cg_player_itm(int p, int itm_pnum) {
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
 			printf("%d번이 %d번에 대해 강탈 성공", p, itm_pnum);
-			Sleep(1000);
+			//Sleep(1000);
 
 			//플레이어가 아이템이 있을 때
 			if (player[p].hasitem) {
@@ -172,7 +172,7 @@ void cg_player_itm(int p, int itm_pnum) {
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
 			printf("%d번이 %d번에 대해 강탈 실패", p, itm_pnum);
-			Sleep(1000);
+			//Sleep(1000);
 
 			player[p].stamina = ((player[p].stamina / 10) * 4);
 		}
@@ -183,7 +183,7 @@ void cg_player_itm(int p, int itm_pnum) {
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
 			printf("%d번이 %d번에 대해 회유 성공", p, itm_pnum);
-			Sleep(1000);
+			//Sleep(1000);
 
 			//플레이어가 아이템이 있을 때
 			if (player[p].hasitem) {
@@ -206,7 +206,7 @@ void cg_player_itm(int p, int itm_pnum) {
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
 			printf("%d번이 %d번에 대해 회유 실패", p, itm_pnum);
-			Sleep(1000);
+			//Sleep(1000);
 
 			player[p].stamina = ((player[p].stamina / 10) * 6);
 		}
@@ -216,7 +216,7 @@ void cg_player_itm(int p, int itm_pnum) {
 		printf("                                                    ");
 		gotoxy(N_ROW, 0);
 		printf("%d번이 %d와 상호작용 무시", p, itm_pnum);
-		Sleep(1000);
+		//Sleep(1000);
 
 		break;
 	default:
@@ -316,7 +316,7 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 	bool itmT_or_playerF = true;
 	int short_index = 0;
 
-	for (int i = 0; i < n_item; i++) {
+	for (int i = 0; i < PLAYER_MAX; i++) {
 		if (itmx[i] != -1 && itmy[i] != -1) {
 			// 아이템과 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
 			int lena = abs(px[p] - itmx[i]) + abs(py[p] - itmy[i]);
@@ -328,7 +328,7 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 	//if (len == INT_MAX) { return 0; }// 아이템 남은 게 없으면 끝나게 하는 임시 제한 코드
 	
 	//아이템이 다 안먹혔을 때 아이템 먼저 추적하도록 제한
-	if (p == 0 || len == INT_MAX) {
+	//if (p == 0 || len == INT_MAX) {
 		for (int i = 0; i < n_player; i++) {
 			if (player[i].hasitem && i != p && player[i].is_alive == true) {
 				// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
@@ -338,7 +338,7 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 				if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
 			}
 		}
-	}
+	//}
 
 	*itm_or_player_num = short_index;
 
