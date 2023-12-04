@@ -10,9 +10,7 @@ bool is_valid(key_t key) {
 		K_DOWN,
 		K_LEFT,
 		K_RIGHT,
-		K_QUIT,
-		L_PULL,
-		R_PULL
+		K_QUIT
 	};
 
 	for (int i = 0; i < N_KEY; i++) { // UNDEFINED Æ÷ÇÔ °³

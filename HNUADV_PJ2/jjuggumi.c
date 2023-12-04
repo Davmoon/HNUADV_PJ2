@@ -107,10 +107,10 @@ int main(void) {
     //intro();
 	jjuggumi_init();//인원 입력 함수
     //sample();
-	mugunghwa();
+	//mugunghwa();
 	//nightgame();
-	//juldarigi();
+	juldarigi();
 	//jebi();
-	ending();
+	//ending();
 	return 0;
 }
