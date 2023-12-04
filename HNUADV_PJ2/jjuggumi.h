@@ -16,8 +16,8 @@ typedef struct {
 	int id;
 	char name[100];
 
-	// 능력치: 지능, 힘, 스태미나
-	int intel, str, stamina;
+	// 능력치: 지능, 힘, 스태미나 d
+	int intel, str, stamina, status;
 
 	bool is_alive;
 	bool hasitem;
@@ -34,7 +34,7 @@ int tick;  // 시계
 void sample(void);
 void mugunghwa(void);
 //void nightgame(void);
-//void juldarigi(void);
+void juldarigi(void);
 //void jebi(void);
 
 int randint(int low, int high);

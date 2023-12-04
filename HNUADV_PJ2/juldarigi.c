@@ -28,6 +28,8 @@ void map(); //맵 생성
 void player_spawn(); //배열안에 플레이어 생성
 void player_change();
 void print_list(); //리스트 출력
+void end(); //게임 끝내기 + 데이터 갱신
+
 
 int a[2][PLAYER_MAX / 2]; //플레이어 리스트 전역변수로 선언
 char maps[3][29];
@@ -172,7 +174,7 @@ void player_change() {
 			}
 		}
 		else { //힘이 0일때
-			maps[3][29];
+			maps[3][29]; //상태 유지
 		}
 	}
 }
@@ -222,19 +224,27 @@ void gamemaster() {
 
 }
 
-//void print_player_list() {
-//	int x = 0;
-//	printf("no. of player left : %d\n", sizeof(player) / sizeof(PLAYER));
-//	for (int i = 0; i < PLAYER_MAX/2; i++) {
-//		
-//		for (int j = 0; j < 2; j++) {
-//			printf("player %d: ",x);
-//			x++;
-//
-//			
-//		}
-//	}
-//}
+void end() {
+	for (int i = 0; i < n_player; i++) {
+		if (player[i].status == 2 || player[i].status == 4) {
+			player[i].is_alive = true; //탈락한적 없는 사람이 살아남거나 탈락했던 사람이 살아남으면 
+			//alive 상태가 true
+		}
+		else if (player[i].status == 1) {
+			//탈락한적 없는 사람이 죽으면 아이템 상실, 지능, 힘이 절반 하락
+			player[i].hasitem = false; //아이템이 먼저 상실해야 기본값이 하락함
+			player[i].intel = player[i].intel / 2;
+			player[i].str = player[i].str / 2;
+		}
+		else if (player[i].status == 3) {
+			player[i].is_alive = false; //탈락한 사람이 이번게임에서 탈락했기 때문에 진짜 사망처리
+ 		}
+	}
+
+
+
+
+}
 
 
 void game() { // 게임 조작, 플레이
