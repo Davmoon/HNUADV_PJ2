@@ -10,6 +10,12 @@ bool is_valid(key_t key) {
 		K_DOWN,
 		K_LEFT,
 		K_RIGHT,
+		K_SPACE,
+		K_YES,
+		K_NO,
+		K_first,
+		K_second,
+		K_third,
 		K_QUIT
 	};
 

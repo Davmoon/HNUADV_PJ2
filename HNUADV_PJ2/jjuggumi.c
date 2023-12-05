@@ -41,7 +41,11 @@ int jjuggumi_init(void) {
 
     fscanf_s(fp, "%d", &n_item);
     for (int i = 0; i < n_item; i++) {
-        fscanf_s(fp, "%s%d%d%d", item[i].name, (unsigned int)sizeof(item[i].name), &(item[i].intel_buf), &(item[i].str_buf), &(item[i].stamina_buf));
+        fscanf_s(fp, "%s%d%d%d", item[i].name,
+            (unsigned int)sizeof(item[i].name),
+            &(item[i].intel_buf),
+            &(item[i].str_buf),
+            &(item[i].stamina_buf));
     }
 
     fclose(fp);
@@ -106,11 +110,12 @@ void ending() {
 int main(void) {
     //intro();
 	jjuggumi_init();//인원 입력 함수
-    //sample();
 	mugunghwa();
 	//nightgame();
 	//juldarigi();
 	//jebi();
 	ending();
+
+    //sample();
 	return 0;
 }
