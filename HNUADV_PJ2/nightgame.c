@@ -168,11 +168,19 @@ void cg_player_itm(int p, int itm_pnum) {
 			player[p].stamina = ((player[p].stamina / 10) * 6);
 		}
 		else {
-			gotoxy(N_ROW, 0);
-			printf("                                                    ");
-			gotoxy(N_ROW, 0);
-			printf("%d번이 %d번에 대해 강탈 실패", p, itm_pnum);
-			//Sleep(1000);
+			if (player[p].stamina > 0) {
+				gotoxy(N_ROW, 0);
+				printf("                                                    ");
+				gotoxy(N_ROW, 0);
+				printf("%d번이 %d번에 대해 강탈 실패", p, itm_pnum);
+				//Sleep(1000);
+			}
+			else {
+				gotoxy(N_ROW, 0);
+				printf("                                                    ");
+				gotoxy(N_ROW, 0);
+				printf("%d번 스테미나 부족", p);
+			}
 
 			player[p].stamina = ((player[p].stamina / 10) * 4);
 		}
@@ -202,21 +210,37 @@ void cg_player_itm(int p, int itm_pnum) {
 			player[p].stamina = ((player[p].stamina / 10) * 8);
 		}
 		else {
-			gotoxy(N_ROW, 0);
-			printf("                                                    ");
-			gotoxy(N_ROW, 0);
-			printf("%d번이 %d번에 대해 회유 실패", p, itm_pnum);
-			//Sleep(1000);
+			if (player[p].stamina > 0) {
+				gotoxy(N_ROW, 0);
+				printf("                                                    ");
+				gotoxy(N_ROW, 0);
+				printf("%d번이 %d번에 대해 회유 실패", p, itm_pnum);
+				//Sleep(1000);
+			}
+			else {
+				gotoxy(N_ROW, 0);
+				printf("                                                    ");
+				gotoxy(N_ROW, 0);
+				printf("%d번 스테미나 부족", p);
+			}
 
 			player[p].stamina = ((player[p].stamina / 10) * 6);
 		}
 		break;
 	case 3: //무시하는 경우
-		gotoxy(N_ROW, 0);
-		printf("                                                    ");
-		gotoxy(N_ROW, 0);
-		printf("%d번이 %d와 상호작용 무시", p, itm_pnum);
-		//Sleep(1000);
+		if (player[p].stamina > 0) {
+			gotoxy(N_ROW, 0);
+			printf("                                                    ");
+			gotoxy(N_ROW, 0);
+			printf("%d번이 %d와 상호작용 무시", p, itm_pnum);
+			//Sleep(1000);
+		}
+		else {
+			gotoxy(N_ROW, 0);
+			printf("                                                    ");
+			gotoxy(N_ROW, 0);
+			printf("%d번 스테미나 부족", p);
+		}
 
 		break;
 	default:
@@ -375,14 +399,14 @@ void nightgame(void) {
 		// 몇분마다 스테미나 추가해줘야 할까? 모르겠다...
 
 		//특정 시간 지나면 게임 자동으로 끝나는 코드
-		gotoxy(N_ROW + 3, 0);
-		printf("게임 종료까지 남은 시간 : %.2lf초", timer / 1000);
-		if (timer <= 0) {
-			Sleep(1000);
-			dialog("게임 종료. 다음 게임 진행.");
-			break;
-		}
-		timer -= 10;
+		//gotoxy(N_ROW + 3, 0);
+		//printf("게임 종료까지 남은 시간 : %.2lf초", timer / 1000);
+		//if (timer <= 0) {
+		//	Sleep(1000);
+		//	dialog("게임 종료. 다음 게임 진행.");
+		//	break;
+		//}
+		//timer -= 10;
 
 		display();
 		Sleep(10);
