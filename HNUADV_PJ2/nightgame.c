@@ -376,7 +376,7 @@ void nightgame(void) {
 	display();
 	double timer = 30000.;
 
-	//dialog("      \"야간 운동\"     ");
+	dialog("      \"야간 운동\"     ");
 
 	while (1) {
 		// player 0만 손으로 움직임(4방향)
@@ -399,14 +399,14 @@ void nightgame(void) {
 		// 몇분마다 스테미나 추가해줘야 할까? 모르겠다...
 
 		//특정 시간 지나면 게임 자동으로 끝나는 코드
-		//gotoxy(N_ROW + 3, 0);
-		//printf("게임 종료까지 남은 시간 : %.2lf초", timer / 1000);
-		//if (timer <= 0) {
-		//	Sleep(1000);
-		//	dialog("게임 종료. 다음 게임 진행.");
-		//	break;
-		//}
-		//timer -= 10;
+		gotoxy(N_ROW + 3, 0);
+		printf("게임 종료까지 남은 시간 : %.2lf초", timer / 1000);
+		if (timer <= 0) {
+			Sleep(1000);
+			dialog("게임 종료. 다음 게임 진행.");
+			break;
+		}
+		timer -= 10;
 
 		display();
 		Sleep(10);

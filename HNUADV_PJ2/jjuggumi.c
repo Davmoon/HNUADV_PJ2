@@ -108,12 +108,12 @@ void ending() {
 
 
 int main(void) {
-    //intro();
+    intro();
 	jjuggumi_init();//인원 입력 함수
 	mugunghwa();
-	//nightgame();
-	//juldarigi();
-	//jebi();
+	nightgame();
+	juldarigi();
+	jebi();
 	ending();
 
     //sample();

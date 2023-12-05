@@ -15,6 +15,7 @@
 #define DIR_DOWN	1
 #define DIR_LEFT	2
 #define DIR_RIGHT	3
+#define DIALOG_DURATION_SEC		4
 
 #define	DATA_FILE	"jjuggumi.dat"
 
@@ -27,8 +28,12 @@ void power(); //힘 계산
 void map(); //맵 생성
 void player_spawn(); //배열안에 플레이어 생성
 void player_change();
-void print_list(); //리스트 출력
 void end(); //게임 끝내기 + 데이터 갱신
+void juldarigi_dialog(char message[]);
+void juldarigi_print_status(void);
+void juldarigi_display(void);
+void juldarigi_map_init(int n_row, int n_col);
+void juldarigi_print_status(void);
 
 
 int px[PLAYER_MAX], py[PLAYER_MAX], jy[3];
@@ -497,42 +502,129 @@ void team_mate() {
 	}
 }
 
-int juldarigi_init(void) {
-
-	FILE* fp;
-	fopen_s(&fp, DATA_FILE, "r");
-	if (fp == NULL) {
-		return -1;
+void juldarigi_map_init(int n_row, int n_col) {
+	// 두 버퍼를를 완전히 비우고 #을 둘레로 채움
+	for (int i = 0; i < ROW_MAX; i++) {
+		for (int j = 0; j < COL_MAX; j++) {
+			back_buf[i][j] = front_buf[i][j] = ' ';
+		}
 	}
 
-	fscanf_s(fp, "%d", &n_player);
+	N_ROW = n_row;
+	N_COL = n_col;
+	for (int i = 0; i < N_ROW; i++) {
+		// 대입문 이렇게 쓸 수 있는데 일부러 안 가르쳐줬음
+		back_buf[i][0] = back_buf[i][N_COL - 1] = '#'; //처음과 끝 부분 # 추가
 
-	n_alive = n_player; //살아있는 플레이어 = 처음 플레이어 수
-
-	for (int i = 0; i < n_player; i++) {
-		// 아직 안 배운 문법(구조체 포인터, 간접참조연산자)
-		PLAYER* p = &player[i];
-
-		fscanf_s(fp, "%s%d%d", p->name, (unsigned int)sizeof(p->name), &(p->intel), &(p->str));
+		for (int j = 1; j < N_COL - 1; j++) {
+			back_buf[i][j] = (i == 0 || i == N_ROW - 1) ? '#' : ' ';// 앞의 열부분에서 처음 끝 채웠으니 행에서는 앞뒤 한줄씩은 다 채우기 코드
+		}
 	}
-
-	fscanf_s(fp, "%d", &n_item);
-	for (int i = 0; i < n_item; i++) {
-		fscanf_s(fp, "%s%d%d%d", item[i].name, (unsigned int)sizeof(item[i].name), &(item[i].intel_buf), &(item[i].str_buf), &(item[i].stamina_buf));
-	}
-
-	fclose(fp);
-	return 0;
+	back_buf[0][N_COL / 2] = back_buf[N_ROW - 1][N_COL / 2] = ' '; //중간 부분 구멍 추가
 }
 
+
+void juldarigi_display(void) {
+	draw();
+	gotoxy(N_ROW + 4, 0);  // 추가로 표시할 정보가 있으면 맵과 상태창 사이의 빈 공간에 출력
+	juldarigi_print_status();
+}
+
+void juldarigi_print_status(void) {
+
+	//10일 경우 남는 칸 생김
+	if (n_alive != 10) { printf("no. of players left: 0%d\n", n_alive); }
+	else { printf("no. of players left: %d\n", n_alive); }
+	printf("\t\t\tintl\tstr\tstm\n");
+	for (int p = 0; p < n_player; p++) {
+		switch (player[p].status) {
+		case 1:
+			//탈락하지 않은 플레이어 죽으면 **
+			printf("player %2d: %7s\t%d(+%d)\t%d(+%d)\t%d%%(%d)\n", p, "alive**", player[p].intel, player[p].item.intel_buf, player[p].str, player[p].item.str_buf, player[p].stamina, player[p].item.stamina_buf);
+
+			break;
+		case 2:
+			//살아있는 상태
+			printf("player %2d: %7s\t%d(+%d)\t%d(+%d)\t%d%%(%d)\n", p, "alive", player[p].intel, player[p].item.intel_buf, player[p].str, player[p].item.str_buf, player[p].stamina, player[p].item.stamina_buf);
+
+			break;
+		case 3:
+			//플레이어 사망
+			printf("player %2d: %7s\t%d(+%d)\t%d(+%d)\t%d%%(%d)\n", p, "DEAD", player[p].intel, player[p].item.intel_buf, player[p].str, player[p].item.str_buf, player[p].stamina, player[p].item.stamina_buf);
+
+			break;
+		case 4:
+			//탈락했던 사람
+			printf("player %2d: %7s\t%d(+%d)\t%d(+%d)\t%d%%(%d)\n", p, "alive*", player[p].intel, player[p].item.intel_buf, player[p].str, player[p].item.str_buf, player[p].stamina, player[p].item.stamina_buf);
+
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
+void juldarigi_dialog(char message[]) {
+
+	int sec = DIALOG_DURATION_SEC + 1; // 0으로 끝나므로 1로 끝나도록 + 1
+	char save_buf[ROW_MAX][COL_MAX]; //세이브 버퍼 생성, 새로운 부분 띄우고 복구하기 위함
+
+	for (int i = 0; i < ROW_MAX; i++) {
+		for (int j = 0; j < COL_MAX; j++) {
+			save_buf[i][j] = back_buf[i][j];//현재 출력중인 버퍼를 저장
+		}
+	}
+
+	int Rmid = N_ROW / 3; //최소한으로 dialog 중앙정렬 위해 맵 세로 3등분해서 처음 + 1
+
+	// '*'로 이루어진 dialog 테두리 출력, 상상력 부족으로 한땀한땀 해봄
+	for (int i = Rmid; i < Rmid + 5; i++) {
+		back_buf[i][2] = back_buf[i][COL_MAX - 45] = '*';
+		back_buf[i][2] = back_buf[i][COL_MAX - 45] = '*';
+		for (int j = 3; j < COL_MAX - 45; j++) {
+			back_buf[i][j] = (i == Rmid || i == Rmid + 4) ? '*' : ' ';
+		}
+	}
+	juldarigi_display();
+
+	int y = 2; // message 출력 아래쪽으로 몇칸인지 지정
+	int sec_x = 4; // sec초 출력 옆으로 몇칸인지 지정
+	int mes_x = 6; // message 출력 옆으로 몇칸인지 지정
+
+	gotoxy(Rmid + y, mes_x); // message 출력
+	printf("%s", message);
+
+	while (sec != 0) {
+		gotoxy(Rmid + y, sec_x); // sec초 출력
+		printf("%d", sec);
+
+		Sleep(1000); // 1초 지연
+		sec--; //초 경과 카운트
+
+	}
+
+	gotoxy(Rmid + y, sec_x);
+	printf("                                         ");
+
+	// front 버퍼 비움, back은 save 버퍼로 복구
+	for (int i = 0; i < ROW_MAX; i++) {
+		for (int j = 0; j < COL_MAX; j++) {
+			back_buf[i][j] = save_buf[i][j];
+
+		}
+	}
+
+	juldarigi_display();
+	//Sleep(2000); // 정지하는 상태인지 파악하기 위한 TEST CODE
+}
+
+
 void juldarigi() {
-	juldarigi_init();
-
+	system("cls");
 	team_mate();
-
 	map();
-
-
+	dialog("      \"줄다리기 게임\"    ");
 	game();
 	end();
 }
