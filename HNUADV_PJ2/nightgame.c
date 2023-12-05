@@ -144,7 +144,7 @@ void cg_player_itm(int p, int itm_pnum) {
 	
 	switch (select) {
 	case 1: //플레이어가 스테미나가 높을 때
-		if (player[p].str > 0 && player[p].str > player[itm_pnum].str) {
+		if (player[p].stamina > 0 && (player[p].str * (player[p].stamina/100)) > (player[itm_pnum].str * (player[itm_pnum].stamina / 100))) {
 			gotoxy(N_ROW, 0);
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
@@ -178,7 +178,7 @@ void cg_player_itm(int p, int itm_pnum) {
 		}
 		break;
 	case 2: //회유하는 경우
-		if (player[p].str > 0 && player[p].intel > player[itm_pnum].intel) {
+		if (player[p].stamina > 0 && (player[p].intel * (player[p].stamina / 100)) > (player[itm_pnum].intel * (player[itm_pnum].stamina / 100))) {
 			gotoxy(N_ROW, 0);
 			printf("                                                    ");
 			gotoxy(N_ROW, 0);
@@ -328,7 +328,7 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 	//if (len == INT_MAX) { return 0; }// 아이템 남은 게 없으면 끝나게 하는 임시 제한 코드
 	
 	//아이템이 다 안먹혔을 때 아이템 먼저 추적하도록 제한
-	//if (p == 0 || len == INT_MAX) {
+	if (p == 0 || len == INT_MAX) {
 		for (int i = 0; i < n_player; i++) {
 			if (player[i].hasitem && i != p && player[i].is_alive == true) {
 				// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
@@ -338,7 +338,7 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 				if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
 			}
 		}
-	//}
+	}
 
 	*itm_or_player_num = short_index;
 
@@ -352,7 +352,7 @@ void nightgame(void) {
 	display();
 	double timer = 30000.;
 
-	dialog("      \"야간 운동\"     ");
+	//dialog("      \"야간 운동\"     ");
 
 	while (1) {
 		// player 0만 손으로 움직임(4방향)
