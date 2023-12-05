@@ -112,7 +112,7 @@ int main(void) {
 	jjuggumi_init();//인원 입력 함수
 	mugunghwa();
 	//nightgame();
-	juldarigi();
+	//juldarigi();
 	//jebi();
 	ending();
 
