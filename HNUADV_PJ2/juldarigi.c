@@ -525,7 +525,7 @@ void juldarigi_map_init(int n_row, int n_col) {
 	
 	//중간 부분 구멍 추가
 	back_buf[0][N_COL / 2] = ' ';
-	back_buf[N_ROW - 1][N_COL / 2] = ' '; 
+	back_buf[2][N_COL / 2] = ' '; 
 }
 
 
