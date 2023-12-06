@@ -325,7 +325,6 @@ void end() {
 	for (int i = 0; i < n_player; i++) {
 		if (player[i].status == 2 || player[i].status == 4) {
 			player[i].is_alive = true; //탈락한적 없는 사람이 살아남거나 탈락했던 사람이 살아남으면
-			n_alive++;
 			//alive 상태가 true
 		}
 		else if (player[i].status == 1) {
@@ -336,7 +335,6 @@ void end() {
 		}
 		else if (player[i].status == 3) {
 			player[i].is_alive = false; //탈락한 사람이 이번게임에서 탈락했기 때문에 진짜 사망처리
-			n_alive--;
 		}
 	}
 }

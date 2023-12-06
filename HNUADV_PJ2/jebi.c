@@ -26,6 +26,14 @@ char msg[50] = { "player", };
 void jebi_init(void) {
 	map_init(9, 24);
 
+	// 줄다리기 오류때문에 임시로 추가..
+	n_alive = 0;
+	for (int i = 0; i < PLAYER_MAX; i++) {
+		if (player[i].is_alive == true) {
+			n_alive++;
+		}
+	}
+
 	//제비 플레이어수만큼 나열
 	for (int i = 0; i < n_alive; i++) {
 		back_buf[4][i * 2 + 2] = '?';
