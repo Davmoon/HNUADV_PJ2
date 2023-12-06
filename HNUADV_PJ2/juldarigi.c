@@ -324,7 +324,8 @@ void gamemaster() {
 void end() {
 	for (int i = 0; i < n_player; i++) {
 		if (player[i].status == 2 || player[i].status == 4) {
-			player[i].is_alive = true; //탈락한적 없는 사람이 살아남거나 탈락했던 사람이 살아남으면 
+			player[i].is_alive = true; //탈락한적 없는 사람이 살아남거나 탈락했던 사람이 살아남으면
+			n_alive++;
 			//alive 상태가 true
 		}
 		else if (player[i].status == 1) {
@@ -335,6 +336,7 @@ void end() {
 		}
 		else if (player[i].status == 3) {
 			player[i].is_alive = false; //탈락한 사람이 이번게임에서 탈락했기 때문에 진짜 사망처리
+			n_alive--;
 		}
 	}
 }
@@ -520,7 +522,10 @@ void juldarigi_map_init(int n_row, int n_col) {
 			back_buf[i][j] = (i == 0 || i == N_ROW - 1) ? '#' : ' ';// 앞의 열부분에서 처음 끝 채웠으니 행에서는 앞뒤 한줄씩은 다 채우기 코드
 		}
 	}
-	back_buf[0][N_COL / 2] = back_buf[N_ROW - 1][N_COL / 2] = ' '; //중간 부분 구멍 추가
+	
+	//중간 부분 구멍 추가
+	back_buf[0][N_COL / 2] = ' ';
+	back_buf[N_ROW - 1][N_COL / 2] = ' '; 
 }
 
 
