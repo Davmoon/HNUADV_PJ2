@@ -352,9 +352,9 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 	//if (len == INT_MAX) { return 0; }// 아이템 남은 게 없으면 끝나게 하는 임시 제한 코드
 	
 	//아이템이 다 안먹혔을 때 아이템 먼저 추적하도록 제한
-	if (p == 0 || len == INT_MAX) {
+	//if (p == 0 || len == INT_MAX) {
 		for (int i = 0; i < n_player; i++) {
-			if (player[i].hasitem && i != p && player[i].is_alive == true) {
+			if (player[i].hasitem == true && i != p && player[i].is_alive == true) {
 				// 두 플레이어 좌표중 어느것이 더 클지 모르기 때문에 abs() 절댓값 사용
 				int lena = abs(px[p] - px[i]) + abs(py[p] - py[i]);
 
@@ -362,7 +362,7 @@ bool ck_near_itm(int p, int* itm_or_player_num) {
 				if (lena < len) { len = lena; short_index = i; itmT_or_playerF = false; }
 			}
 		}
-	}
+	//}
 
 	*itm_or_player_num = short_index;
 
@@ -374,14 +374,29 @@ void nightgame(void) {
 	ng_init();
 	system("cls");
 	display();
-	double timer = 30000.;
+	double timer = 20000.;
 
 	dialog("      \"야간 운동\"     ");
 
 	while (1) {
+
+		//
+
+		gotoxy(N_ROW + 3, 0);
+		printf("게임 종료까지 남은 시간 : %.2lf초", timer / 1000);
+
 		// player 0만 손으로 움직임(4방향)
 		key_t key = get_key();
-		if (key == K_QUIT) {
+		if (key == K_QUIT || timer <= 0) {
+			// 스테미나 40 회복
+			for (int i = 0; i < n_player; i++) {
+				player[i].stamina += 40;
+				if (player[i].stamina > 100) {
+					player[i].stamina = 100;
+				}
+			}
+
+			dialog("게임 종료. 다음 게임 진행.");
 			break;
 		}
 		else if (key != K_UNDEFINED) {
@@ -398,16 +413,7 @@ void nightgame(void) {
 
 		// 몇분마다 스테미나 추가해줘야 할까? 모르겠다...
 
-		//특정 시간 지나면 게임 자동으로 끝나는 코드
-		gotoxy(N_ROW + 3, 0);
-		printf("게임 종료까지 남은 시간 : %.2lf초", timer / 1000);
-		if (timer <= 0) {
-			Sleep(1000);
-			dialog("게임 종료. 다음 게임 진행.");
-			break;
-		}
 		timer -= 10;
-
 		display();
 		Sleep(10);
 		tick += 10;
