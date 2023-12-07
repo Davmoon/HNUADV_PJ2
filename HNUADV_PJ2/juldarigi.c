@@ -570,7 +570,7 @@ void juldarigi_print_status(void) {
 
 void juldarigi_dialog(char message[]) {
 
-	int sec = DIALOG_DURATION_SEC + 1; // 0으로 끝나므로 1로 끝나도록 + 1
+	int sec = 1; // 0으로 끝나므로 1로 끝나도록 + 1
 	char save_buf[ROW_MAX][COL_MAX]; //세이브 버퍼 생성, 새로운 부분 띄우고 복구하기 위함
 
 	for (int i = 0; i < ROW_MAX; i++) {
