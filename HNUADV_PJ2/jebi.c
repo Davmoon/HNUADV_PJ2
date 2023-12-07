@@ -18,6 +18,9 @@ void print_rp(int);
 void ck_kill(int*, bool);
 void jebi(void);
 
+/*진행 방법 : 0번이 살아있는 경우, 0번은 선택가능, 나머지는 자동 선택.
+0번이 죽은 경우 자동으로 진행됨.*/ 
+
 // 당첨 제비 구분 용도 0번: 플레이어 제외, 1번 살아있음, 2번 죽음 뽑기
 int px[PLAYER_MAX], py[PLAYER_MAX];
 int count_r; //라운드 카운터

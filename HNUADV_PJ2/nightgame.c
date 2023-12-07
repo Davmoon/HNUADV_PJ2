@@ -19,6 +19,8 @@ bool ck_near_itm(int, int*);
 
 int px[PLAYER_MAX], py[PLAYER_MAX], period[PLAYER_MAX], itmx[PLAYER_MAX], itmy[PLAYER_MAX];
 
+/* 특정 (20)초가 지나면 자동으로 종료할 수 있도록 함. q를 눌러도 종료할 수 있음*/
+
 void ng_init(void) {
 	map_init(15, 40);//#으로 둘러쌓인 sample.c의 실제 플레이 맵 부분
 	//int period_set[] = { 800,800,800,800,800,800,800,800,800,800 };
@@ -410,8 +412,6 @@ void nightgame(void) {
 				ngmv_random(i);
 			}
 		}
-
-		// 몇분마다 스테미나 추가해줘야 할까? 모르겠다...
 
 		timer -= 10;
 		display();
