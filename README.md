@@ -21,8 +21,8 @@ C 언어(구조체) 쭈꾸미 게임
 - 시작 애니메이션
 - ~무궁화 꽃~
 - 야간운동
-- 줄다리기
-- 제비뽑기
+- 줄다리기 ~버그 존재~
+- 제비뽑기 ~타 플레이어 자동 선택 기능으로 인한 키 씹힘 존재~
 
 ## Git 동기화 방법.
 1. [git 프로그램 64bit 다운](https://git-scm.com/download/win), [visual studio community 다운](https://visualstudio.microsoft.com/ko/), c++ 데스크톱 개발을 위한~~ 체크
