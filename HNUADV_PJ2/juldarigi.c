@@ -87,7 +87,7 @@ void player_spawn() { //½ºÆù
 			y++;
 		}
 	}
-}
+}//test
 
 void player_change() {
 	if (b_RLiedown || b_LLiedown)
